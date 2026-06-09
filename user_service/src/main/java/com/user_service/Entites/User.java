@@ -5,8 +5,15 @@ import com.user_service.Enums.Role;
 import jakarta.persistence.Table;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+
+
 
 @Entity
 @Table(name = "users")
@@ -14,11 +21,15 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    @column(name = "full_name", nullable = false)
+    @Column(name = "full_name", nullable = false)
     private String fullName;
+    @Column(name="email",nullable = false, unique = true)
     private String email;
+    @Column(name = "phone_number", nullable = false, unique = true)
     private String phoneNumber;
+    @Column(name = "password", nullable = false)
     private String password;
+    @Enumerated(EnumType.STRING)
     private Role role;
     private String profilePicture;
     private Boolean isVerified;
@@ -108,5 +119,14 @@ public class User {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+@PrePersist
+public void onCreate() {
+    createdAt = LocalDateTime.now();
+    updatedAt = LocalDateTime.now();
+}
 
+@PreUpdate
+public void onUpdate() {
+    updatedAt = LocalDateTime.now();
+}
 }
