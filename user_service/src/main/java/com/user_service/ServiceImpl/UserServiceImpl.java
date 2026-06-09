@@ -62,9 +62,14 @@ public class UserServiceImpl implements UserService {
         return userDTO;
     }
     @Override
-    public void deleteUserByEmail(String email) {
-        // TODO Auto-generated method stub
-        
+    public void deleteUserByEmail(UUID id) {
+        User user=userRepository.findById(id).orElseThrow(()->new IllegalArgumentException("User not found with id: "+id));
+        if(user!=null){
+            userRepository.deleteByEmail(id);
+        }
+        else{
+            throw new IllegalArgumentException("User not found with id: "+id);
+        }  
     }
     @Override
     public Optional<UserDTO> getUserByEmail(String email) {

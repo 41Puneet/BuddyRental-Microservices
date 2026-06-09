@@ -9,6 +9,6 @@ import com.user_service.DTO.UserDTO;
 public interface UserRepository extends JpaRepository<User,UUID>{
 Optional<User>findByEmail(String email);
 Optional<User>findByPhoneNumber(String phoneNumber);
-void deleteByEmail(String email);
-UserDTO updateUser(String email,UserDTO userDTO);
+void deleteByEmail(UUID id);
+UserDTO updateUser(UUID id,UserDTO userDTO);
 }
