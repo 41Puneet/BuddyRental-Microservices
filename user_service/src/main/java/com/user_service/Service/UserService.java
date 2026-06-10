@@ -9,6 +9,6 @@ public interface UserService {
     UserDTO createUser(RegisterRequestDTO registerRequestDTO);
     Optional <UserDTO> getUserByEmail(String email);
     Optional <UserDTO> getUserByPhoneNumber(String phoneNumber);
-    void deleteUserByEmail(UUID id);
+    void deleteUser(UUID id);
     UserDTO updateUser(UUID id,UserDTO userDTO);
 }

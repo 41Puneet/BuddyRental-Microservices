@@ -1,10 +1,11 @@
 package com.user_service.DTO;
-
+import java.util.UUID;
 import java.time.LocalDateTime;
 import com.user_service.Enums.Role;
 
 
 public class UserDTO {
+    private UUID id;
      private String fullName;
     private String email;
     private String phoneNumber;
@@ -19,17 +20,21 @@ public class UserDTO {
     public UserDTO(){
 
     }
-    public UserDTO(String fullName,String email, String phoneNumber,Role role,String profilePicture,Boolean isVerified,Double rating,LocalDateTime createdAt,LocalDateTime updatedAt){
-        this.fullName=fullName;
-        this.email=email;
-        this.phoneNumber=phoneNumber;
-        this.role=role;
-        this.profilePicture=profilePicture;
+    public UserDTO(UUID id, String fullName, String email, String phoneNumber, Role role, String profilePicture, Boolean isVerified, Double rating, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.fullName = fullName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.role = role;
+        this.profilePicture = profilePicture;
         this.isVerified=isVerified;
         this.rating=rating;
         this.createdAt=createdAt;
         this.updatedAt=updatedAt;
 
+    }
+    public UUID getId() {
+        return id;
     }
     public String getFullName() {
         return fullName;

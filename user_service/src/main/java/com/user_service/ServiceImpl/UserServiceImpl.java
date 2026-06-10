@@ -2,32 +2,25 @@ package com.user_service.ServiceImpl;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.user_service.DTO.RegisterRequestDTO;
 import com.user_service.DTO.UserDTO;
 import com.user_service.Entites.User;
 import com.user_service.Repository.UserRepository;
-import com.user_service.Security.JwtService;
 import com.user_service.Service.UserService;
 
 @Service
 public class UserServiceImpl implements UserService {
     
 
-
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService) {
+   
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
+       
     }
     @Override
     public UserDTO createUser(RegisterRequestDTO registerRequestDTO) {
@@ -62,7 +55,7 @@ public class UserServiceImpl implements UserService {
         return userDTO;
     }
     @Override
-    public void deleteUserByEmail(UUID id) {
+    public void deleteUser(UUID id) {
         User user=userRepository.findById(id).orElseThrow(()->new IllegalArgumentException("User not found with id: "+id));
         if(user!=null){
             userRepository.deleteByEmail(id);
@@ -73,17 +66,32 @@ public class UserServiceImpl implements UserService {
     }
     @Override
     public Optional<UserDTO> getUserByEmail(String email) {
-        // TODO Auto-generated method stub
+        User user=userRepository.findByEmail(email).orElseThrow(()->new IllegalArgumentException("User not found with email:"+email));
+        if(user!=null){
+            return Optional.of(mapToUserDTO(user));
+        }
         return Optional.empty();
     }
     @Override
     public Optional<UserDTO> getUserByPhoneNumber(String phoneNumber) {
-        // TODO Auto-generated method stub
+        User user=userRepository.findByPhoneNumber(phoneNumber).orElseThrow(()->new IllegalArgumentException("User not found with phone number:"+phoneNumber));
+        if(user!=null){
+            return Optional.of(mapToUserDTO(user));
+        }
         return Optional.empty();
     }
     @Override
     public UserDTO updateUser(UUID id, UserDTO userDTO) {
-        // TODO Auto-generated method stub
+        User user=userRepository.findById(id).orElseThrow(()->new IllegalArgumentException("User not found with id: "+id));
+        if(user!=null){
+            user.setFullName(userDTO.getFullName());
+            user.setEmail(userDTO.getEmail());
+            user.setPhoneNumber(userDTO.getPhoneNumber());
+            user.setRole(userDTO.getRole());
+            user.setUpdatedAt(userDTO.getUpdatedAt());
+            User updatedUser=userRepository.save(user);
+            return mapToUserDTO(updatedUser);
+        }
         return null;
     }
 
