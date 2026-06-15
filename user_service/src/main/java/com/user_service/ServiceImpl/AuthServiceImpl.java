@@ -72,20 +72,20 @@ public class AuthServiceImpl implements AuthService{
         return authResponseDTO;
 
     }
-    private UserDTO mapToUserDTO(User user){
-        if(user==null)return null;
-        UserDTO userDTO=new UserDTO();
-        userDTO.setFullName(user.getFullName());
-        userDTO.setEmail(user.getEmail());
-        userDTO.setPhoneNumber(user.getPhoneNumber());
-        userDTO.setRole(user.getRole());
-        userDTO.setProfilePicture(user.getProfilePicture());
-        userDTO.setIsVerified(user.getIsVerified());
-        userDTO.setRating(user.getRating());
-        userDTO.setCreatedAt(user.getCreatedAt());
-        userDTO.setUpdatedAt(user.getUpdatedAt());
-        return userDTO;
-    }
+//     private UserDTO mapToUserDTO(User user){
+//         if(user==null)return null;
+//         UserDTO userDTO=new UserDTO();
+//         userDTO.setFullName(user.getFullName());
+//         userDTO.setEmail(user.getEmail());
+//         userDTO.setPhoneNumber(user.getPhoneNumber());
+//         userDTO.setRole(user.getRole());
+//         userDTO.setProfilePicture(user.getProfilePicture());
+//         userDTO.setIsVerified(user.getIsVerified());
+//         userDTO.setRating(user.getRating());
+//         userDTO.setCreatedAt(user.getCreatedAt());
+//         userDTO.setUpdatedAt(user.getUpdatedAt());
+//         return userDTO;
+//     }
 
     @Override
     public AuthResponseDTO refreshToken(String refreshToken) {
