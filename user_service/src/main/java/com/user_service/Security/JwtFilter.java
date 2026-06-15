@@ -18,11 +18,18 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtService jwtService;
+    
+    private final JwtService jwtService;
 
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
+
+    public JwtFilter(JwtService jwtService,
+        CustomUserDetailsService customUserDetailsService) {
+
+        this.jwtService = jwtService;
+        this.customUserDetailsService = customUserDetailsService;
+    }
+
 
     @Override
     protected void doFilterInternal(

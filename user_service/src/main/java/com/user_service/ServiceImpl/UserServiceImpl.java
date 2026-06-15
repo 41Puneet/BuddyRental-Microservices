@@ -1,7 +1,8 @@
 package com.user_service.ServiceImpl;
 import java.util.Optional;
 import java.util.UUID;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.user_service.DTO.RegisterRequestDTO;
@@ -16,6 +17,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final Logger logger=LoggerFactory.getLogger(UserServiceImpl.class);
    
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -26,6 +28,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO createUser(RegisterRequestDTO registerRequestDTO) {
         Optional<User> existingUserByEmail = userRepository.findByEmail(registerRequestDTO.getEmail());
         if(existingUserByEmail.isPresent()){
+            logger.warn("Email already exist {}",registerRequestDTO.getEmail());
             throw new IllegalArgumentException("Email already exists");
         }
         Optional<User> existingUserByPhoneNumber = userRepository.findByPhoneNumber(registerRequestDTO.getPhoneNumber());
@@ -37,7 +40,6 @@ public class UserServiceImpl implements UserService {
         user.setEmail(registerRequestDTO.getEmail());
         user.setPhoneNumber(registerRequestDTO.getPhoneNumber());
         user.setPassword(passwordEncoder.encode(registerRequestDTO.getPassword()));
-        user.setRole(registerRequestDTO.getRole());
         user.setCreatedAt(registerRequestDTO.getCreatedAt());
         user.setUpdatedAt(registerRequestDTO.getUpdatedAt());
         User savedUser=userRepository.save(user);
@@ -58,6 +60,7 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(UUID id) {
         User user=userRepository.findById(id).orElseThrow(()->new IllegalArgumentException("User not found with id: "+id));
         if(user!=null){
+            logger.info("user deleted successfully{}",id);
             userRepository.deleteByEmail(id);
         }
         else{
@@ -90,6 +93,7 @@ public class UserServiceImpl implements UserService {
             user.setRole(userDTO.getRole());
             user.setUpdatedAt(userDTO.getUpdatedAt());
             User updatedUser=userRepository.save(user);
+            logger.info("updated the user successfully{}",userDTO.getEmail());
             return mapToUserDTO(updatedUser);
         }
         return null;
