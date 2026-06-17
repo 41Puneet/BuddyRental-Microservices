@@ -1,7 +1,6 @@
 package com.vehicle_service.Controller;
 
 import java.util.Optional;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PutMapping;
-
 import com.vehicle_service.DTO.VehicleRequestDTO;
 import com.vehicle_service.DTO.VehicleResponseDTO;
 import com.vehicle_service.Enums.FuelType;
