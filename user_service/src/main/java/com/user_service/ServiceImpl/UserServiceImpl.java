@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
         User user=userRepository.findById(id).orElseThrow(()->new IllegalArgumentException("User not found with id: "+id));
         if(user!=null){
             logger.info("user deleted successfully{}",id);
-            userRepository.deleteByEmail(id);
+            userRepository.deleteById(id);
         }
         else{
             throw new IllegalArgumentException("User not found with id: "+id);

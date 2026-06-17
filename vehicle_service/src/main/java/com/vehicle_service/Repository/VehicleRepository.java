@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 
 
 
-public interface VehicleRepository extends JpaRepository<Vehicle,String> {
+public interface VehicleRepository extends JpaRepository<Vehicle,Long> {
 
     Page<Vehicle> findByCity(String city,Pageable pageable);
     List<Vehicle>findByTransmissionType(TransmissionType transmissionType);
@@ -26,8 +26,6 @@ public interface VehicleRepository extends JpaRepository<Vehicle,String> {
 
     Page<Vehicle>findByBrand(String brand,Pageable pageable);
 
-    Page<Vehicle>findByPriceBetween(int minPrice,int maxPrice,Pageable pageable);
-
-    Page<Vehicle>findByModel(String model,Pageable pageable);
+    Page<Vehicle>findByPricePerDayBetween(Double minPrice,Double maxPrice,Pageable pageable);
 
 }

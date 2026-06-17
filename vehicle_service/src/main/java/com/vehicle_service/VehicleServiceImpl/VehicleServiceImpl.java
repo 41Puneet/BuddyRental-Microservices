@@ -44,6 +44,7 @@ public class VehicleServiceImpl implements VehicleService{
     newVehicle.setVehicleNumber(vehicleRequestDTO.getVehicleNumber());
     newVehicle.setOwnerId(vehicleRequestDTO.getOwnerId());
     newVehicle.setBrand(vehicleRequestDTO.getBrand());
+    newVehicle.setModel(vehicleRequestDTO.getModel());
     newVehicle.setVehicleType(vehicleRequestDTO.getVehicleType());
     newVehicle.setTransmissionType(vehicleRequestDTO.getTransmissionType());
     newVehicle.setPricePerDay(vehicleRequestDTO.getPricePerDay());
@@ -63,6 +64,7 @@ private VehicleResponseDTO mapToVehicleDTO(Vehicle vehicle){
     vehicleDTO.setVehicleNumber(vehicle.getVehicleNumber());
     vehicleDTO.setOwnerId(vehicle.getOwnerId());
     vehicleDTO.setBrand(vehicle.getBrand());
+    vehicleDTO.setModel(vehicle.getModel());
     vehicleDTO.setPricePerDay(vehicle.getPricePerDay());
     vehicleDTO.setSecurityPrice(vehicle.getSecurityPrice());
     vehicleDTO.setAdvancePayment(vehicle.getAdvancePayment());
@@ -127,7 +129,7 @@ private VehicleResponseDTO mapToVehicleDTO(Vehicle vehicle){
     @Override
     public Page<VehicleResponseDTO> findByModel(String model, Pageable pageable) {
         Pageable page=PageRequest.of(pageable.getPageNumber(),pageable.getPageSize());
-        Page<Vehicle>vehicle=vehicleRepository.findByModel(model, page);
+        Page<Vehicle>vehicle=vehicleRepository.findByBrand(model, page);
         logger.info("vehicle found successfully with model{}",model);
         return vehicle.map(this::mapToVehicleDTO);
 
@@ -136,7 +138,7 @@ private VehicleResponseDTO mapToVehicleDTO(Vehicle vehicle){
     @Override
     public Page<VehicleResponseDTO> findByPriceBetween(int minPrice, int maxPrice, Pageable pageable) {
         Pageable pageables=PageRequest.of(pageable.getPageNumber(),pageable.getPageSize());
-        Page<Vehicle>vehicle=vehicleRepository.findByPriceBetween(minPrice, maxPrice, pageables);
+        Page<Vehicle>vehicle=vehicleRepository.findByPricePerDayBetween((double) minPrice, (double) maxPrice, pageables);
         logger.info("vehicles fetched successfully between {} &{}",minPrice,maxPrice);
         return vehicle.map(this::mapToVehicleDTO);
     }
@@ -167,6 +169,7 @@ private VehicleResponseDTO mapToVehicleDTO(Vehicle vehicle){
         vehicle.setVehicleNumber(vehicleRequestDTO.getVehicleNumber());
         vehicle.setOwnerId(vehicleRequestDTO.getOwnerId());
         vehicle.setBrand(vehicleRequestDTO.getBrand());
+        vehicle.setModel(vehicleRequestDTO.getModel());
         vehicle.setVehicleType(vehicleRequestDTO.getVehicleType());
         vehicle.setTransmissionType(vehicleRequestDTO.getTransmissionType());
         vehicle.setPricePerDay(vehicleRequestDTO.getPricePerDay());

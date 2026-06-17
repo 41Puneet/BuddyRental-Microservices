@@ -9,6 +9,7 @@ public class VehicleResponseDTO {
     private String vehicleNumber;
     private String ownerId;
     private String brand;
+    private String model;
     private Double pricePerDay;
     private Double securityPrice;
     private Double AdvancePayment;
@@ -22,10 +23,11 @@ public class VehicleResponseDTO {
     public VehicleResponseDTO(){
 
     }
-    public VehicleResponseDTO(String vehicleNumber,String ownerId,String brand,VehicleType vehicleType,FuelType fuelType,TransmissionType transmissionType,Double pricePerDay,Double securityPrice,Double AdvancePayment,Integer manufacturingYear,String city,Boolean isAvailable){
+    public VehicleResponseDTO(String vehicleNumber,String ownerId,String brand,String model,VehicleType vehicleType,FuelType fuelType,TransmissionType transmissionType,Double pricePerDay,Double securityPrice,Double AdvancePayment,Integer manufacturingYear,String city,Boolean isAvailable){
         this.vehicleNumber=vehicleNumber;
         this.ownerId=ownerId;
         this.brand=brand;
+        this.model=model;
         this.vehicleType=vehicleType;
         this.fuelType=fuelType;
         this.transmissionType=transmissionType;
@@ -59,6 +61,14 @@ public class VehicleResponseDTO {
 
     public void setBrand(String brand) {
         this.brand = brand;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
     }
 
     public VehicleType getVehicleType() {
@@ -133,4 +143,3 @@ public class VehicleResponseDTO {
 
     
 }
-

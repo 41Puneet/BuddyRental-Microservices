@@ -1,22 +1,33 @@
 package com.vehicle_service.Entity;
-import java.util.UUID;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import com.vehicle_service.Enums.FuelType;
 import com.vehicle_service.Enums.TransmissionType;
 import com.vehicle_service.Enums.VehicleType;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Table;
 
 
 
 @Entity
 @Table(name="vehicleEntity")
 public class Vehicle {
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    private Long vehicleId;
     private String vehicleNumber;
     private String ownerId;
     private String brand;
+    private String model;
+    @Enumerated(EnumType.STRING)
     private VehicleType vehicleType;
+    @Enumerated(EnumType.STRING)
     private FuelType fuelType;
+    @Enumerated(EnumType.STRING)
     private TransmissionType transmissionType;
     private Double pricePerDay;
     private Double securityPrice;
@@ -29,11 +40,12 @@ public class Vehicle {
     public Vehicle(){
 
     }
-    public Vehicle(String vehicleNumber,String ownerId,String brand,VehicleType vehicleType,FuelType fuelType,TransmissionType transmissionType,Double pricePerDay,Double securityPrice,Double AdvancePayment,Integer manufacturingYear,String city,boolean isAvailable){
+    public Vehicle(Long vehicleId,String vehicleNumber,String ownerId,String brand,String model,VehicleType vehicleType,FuelType fuelType,TransmissionType transmissionType,Double pricePerDay,Double securityPrice,Double AdvancePayment,Integer manufacturingYear,String city,boolean isAvailable){
+        this.vehicleId=vehicleId;
         this.vehicleNumber=vehicleNumber;
         this.ownerId=ownerId;
         this.brand=brand;
-       
+        this.model=model;
         this.vehicleType=vehicleType;
         this.fuelType=fuelType;
         this.transmissionType=transmissionType;
@@ -69,6 +81,20 @@ public class Vehicle {
         this.brand = brand;
     }
 
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public Long getVehicleId() {
+        return vehicleId;
+    }
+    public void setVehicleId(Long vehicleId) {
+        this.vehicleId = vehicleId;
+    }
     public VehicleType getVehicleType() {
         return vehicleType;
     }
@@ -142,5 +168,4 @@ public class Vehicle {
     }
     
     }
-
 
