@@ -9,9 +9,16 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
+
+    private final JwtFilter jwtFilter;
+
+    public SecurityConfig(JwtFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
@@ -27,9 +34,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
 
                 .requestMatchers(
-                    "/auth/register",
-                    "/auth/login",
-                    "/auth/refresh"
+                    "/api/auth/register",
+                    "/api/auth/login",
+                    "/api/auth/refresh-token",
+                    "/api/users/create"
                 ).permitAll()
 
                 .requestMatchers("/admin/**")
@@ -38,6 +46,10 @@ public class SecurityConfig {
                 .anyRequest()
                 .authenticated()
             );
+
+        http.addFilterBefore(
+                jwtFilter,
+                UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
