@@ -22,8 +22,12 @@ public interface VehicleRepository extends JpaRepository<Vehicle,String> {
 
     Optional<Vehicle>findByVehicleNumber(String VehicleNumber);
 
-    Page<Vehicle>findByManufacturingYear(String manufacturingYear,Pageable pageable);
+    Page<Vehicle>findByManufacturingYear(Integer manufacturingYear,Pageable pageable);
 
     Page<Vehicle>findByBrand(String brand,Pageable pageable);
+
+    Page<Vehicle>findByPriceBetween(int minPrice,int maxPrice,Pageable pageable);
+
+    Page<Vehicle>findByModel(String model,Pageable pageable);
 
 }

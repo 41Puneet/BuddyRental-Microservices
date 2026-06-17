@@ -13,7 +13,7 @@ import com.vehicle_service.Enums.VehicleType;
 @Table(name="vehicleEntity")
 public class Vehicle {
     private String vehicleNumber;
-    private Long ownerId;
+    private String ownerId;
     private String brand;
     private VehicleType vehicleType;
     private FuelType fuelType;
@@ -21,7 +21,7 @@ public class Vehicle {
     private Double pricePerDay;
     private Double securityPrice;
     private Double AdvancePayment;
-    private String manufacturingYear;
+    private Integer manufacturingYear;
     private String city;
     private boolean isAvailable;
 
@@ -29,7 +29,7 @@ public class Vehicle {
     public Vehicle(){
 
     }
-    public Vehicle(String vehicleNumber,Long ownerId,String brand,VehicleType vehicleType,FuelType fuelType,TransmissionType transmissionType,Double pricePerDay,Double securityPrice,Double AdvancePayment,String manufacturingYear,String city,boolean isAvailable){
+    public Vehicle(String vehicleNumber,String ownerId,String brand,VehicleType vehicleType,FuelType fuelType,TransmissionType transmissionType,Double pricePerDay,Double securityPrice,Double AdvancePayment,Integer manufacturingYear,String city,boolean isAvailable){
         this.vehicleNumber=vehicleNumber;
         this.ownerId=ownerId;
         this.brand=brand;
@@ -53,11 +53,11 @@ public class Vehicle {
         this.vehicleNumber = vehicleNumber;
     }
 
-    public Long getOwnerId() {
+    public String getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(Long ownerId) {
+    public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
     }
 
@@ -117,11 +117,11 @@ public class Vehicle {
         this.AdvancePayment = AdvancePayment;
     }
 
-    public String getManufacturingYear() {
+    public Integer getManufacturingYear() {
         return manufacturingYear;
     }
 
-    public void setManufacturingYear(String manufacturingYear) {
+    public void setManufacturingYear(Integer manufacturingYear) {
         this.manufacturingYear = manufacturingYear;
     }
 

@@ -2,14 +2,17 @@ package com.vehicle_service.VehicleServiceImpl;
 
 import java.util.List;
 import java.util.Optional;
-import com.vehicle_service.Entity.Vehicle;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import com.vehicle_service.DTO.VehicleRequestDTO;
 import com.vehicle_service.DTO.VehicleResponseDTO;
+import com.vehicle_service.Entity.Vehicle;
 import com.vehicle_service.Enums.FuelType;
 import com.vehicle_service.Enums.TransmissionType;
 import com.vehicle_service.Enums.VehicleType;
@@ -38,75 +41,144 @@ public class VehicleServiceImpl implements VehicleService{
             throw new IllegalArgumentException("Vehicle already exists with number: " + vehicleRequestDTO.getVehicleNumber());
         }
     Vehicle newVehicle = new Vehicle();
+    newVehicle.setVehicleNumber(vehicleRequestDTO.getVehicleNumber());
+    newVehicle.setOwnerId(vehicleRequestDTO.getOwnerId());
+    newVehicle.setBrand(vehicleRequestDTO.getBrand());
+    newVehicle.setVehicleType(vehicleRequestDTO.getVehicleType());
+    newVehicle.setTransmissionType(vehicleRequestDTO.getTransmissionType());
+    newVehicle.setPricePerDay(vehicleRequestDTO.getPricePerDay());
+    newVehicle.setAdvancePayment(vehicleRequestDTO.getAdvancePayment());
+    newVehicle.setSecurityPrice(vehicleRequestDTO.getSecurityPrice());
+    newVehicle.setManufacturingYear(vehicleRequestDTO.getManufacturingYear());
+    newVehicle.setCity(vehicleRequestDTO.getCity());
+    newVehicle.setIsAvailable(true);
 
-        return null;
+    Vehicle savedvehicle=vehicleRepository.save(newVehicle);
+      logger.info("vehicle created successfully");
+        return mapToVehicleDTO(savedvehicle);
     }
-
+private VehicleResponseDTO mapToVehicleDTO(Vehicle vehicle){
+    if(vehicle==null)return null;
+    VehicleResponseDTO vehicleDTO=new VehicleResponseDTO();
+    vehicleDTO.setVehicleNumber(vehicle.getVehicleNumber());
+    vehicleDTO.setOwnerId(vehicle.getOwnerId());
+    vehicleDTO.setBrand(vehicle.getBrand());
+    vehicleDTO.setPricePerDay(vehicle.getPricePerDay());
+    vehicleDTO.setSecurityPrice(vehicle.getSecurityPrice());
+    vehicleDTO.setAdvancePayment(vehicle.getAdvancePayment());
+    vehicleDTO.setManufacturingYear(vehicle.getManufacturingYear());
+    vehicleDTO.setCity(vehicle.getCity());
+    vehicleDTO.setVehicleType(vehicle.getVehicleType());
+    vehicleDTO.setFuelType(vehicle.getFuelType());
+    vehicleDTO.setTransmissionType(vehicle.getTransmissionType());
+    vehicleDTO.setIsAvailable(true);
+    return vehicleDTO;
+}
     @Override
     public void deleteVehicle(String vehicleNumber) {
-        // TODO Auto-generated method stub
-        
+        Optional<Vehicle>vehicle=vehicleRepository.findByVehicleNumber(vehicleNumber);
+        if(vehicle.isEmpty()){
+            logger.warn("vehicle not found{}:",vehicleNumber);
+            throw new IllegalArgumentException("Vehicle not found with number:"+vehicleNumber);
+        }
+        vehicleRepository.delete(vehicle.get());
+        logger.info("vehicle deleted successfully");
     }
 
     @Override
     public Page<VehicleResponseDTO> findByBrand(String brand, Pageable pageable) {
-        // TODO Auto-generated method stub
-        return null;
+        Pageable page=PageRequest.of(pageable.getPageNumber(),pageable.getPageSize());
+        Page<Vehicle>vehicles=vehicleRepository.findByBrand(brand, page);
+        logger.info("vehicle found successfully");
+        return vehicles.map(this::mapToVehicleDTO);
     }
 
     @Override
     public Page<VehicleResponseDTO> findByCity(String city, Pageable pageable) {
-        // TODO Auto-generated method stub
-        return null;
+        Pageable page=PageRequest.of(pageable.getPageNumber(),pageable.getPageSize());
+        Page<Vehicle>vehicles=vehicleRepository.findByCity(city, page);
+        logger.info("Vehicle found successfully in the city{}",city);
+        return vehicles.map(this::mapToVehicleDTO);
     }
 
     @Override
     public List<VehicleResponseDTO> findByFuelTypeAndTransmissionType(FuelType fuelType,
             TransmissionType transmissionType) {
-        // TODO Auto-generated method stub
-        return null;
+        List<Vehicle>vehicle=vehicleRepository.findByFuelTypeAndTransmissionType(fuelType, transmissionType);
+        logger.info("vehicle found successfully");
+        return vehicle.stream().map(this::mapToVehicleDTO).toList();
     }
 
     @Override
     public List<VehicleResponseDTO> findByFuelTypeAndVehicleType(FuelType fuelType, VehicleType vehicleType) {
-        // TODO Auto-generated method stub
-        return null;
+        List<Vehicle>vehicle=vehicleRepository.findByFuelTypeAndVehicleType(fuelType, vehicleType);
+        logger.info("vehicle found successfully with fueltype{} & vehicleType{}",fuelType,vehicleType);
+       return vehicle.stream().map(this::mapToVehicleDTO).toList();
     }
 
     @Override
     public Page<VehicleResponseDTO> findByManufacturingYear(Integer manufacturingYear, Pageable pageable) {
-        // TODO Auto-generated method stub
-        return null;
+        Pageable page=PageRequest.of(pageable.getPageNumber(),pageable.getPageSize());
+        Page<Vehicle>vehicle=vehicleRepository.findByManufacturingYear(manufacturingYear, page);
+        logger.info("vehicle found successfully with manufacturing year{}",manufacturingYear);
+        return vehicle.map(this::mapToVehicleDTO);
     }
 
     @Override
     public Page<VehicleResponseDTO> findByModel(String model, Pageable pageable) {
-        // TODO Auto-generated method stub
-        return null;
+        Pageable page=PageRequest.of(pageable.getPageNumber(),pageable.getPageSize());
+        Page<Vehicle>vehicle=vehicleRepository.findByModel(model, page);
+        logger.info("vehicle found successfully with model{}",model);
+        return vehicle.map(this::mapToVehicleDTO);
+
     }
 
     @Override
     public Page<VehicleResponseDTO> findByPriceBetween(int minPrice, int maxPrice, Pageable pageable) {
-        // TODO Auto-generated method stub
-        return null;
+        Pageable pageables=PageRequest.of(pageable.getPageNumber(),pageable.getPageSize());
+        Page<Vehicle>vehicle=vehicleRepository.findByPriceBetween(minPrice, maxPrice, pageables);
+        logger.info("vehicles fetched successfully between {} &{}",minPrice,maxPrice);
+        return vehicle.map(this::mapToVehicleDTO);
     }
 
     @Override
     public List<VehicleResponseDTO> findByTransmissionType(TransmissionType transmissionType) {
-        // TODO Auto-generated method stub
-        return null;
+        List<Vehicle>vehicle=vehicleRepository.findByTransmissionType(transmissionType);
+        return vehicle.stream().map(this::mapToVehicleDTO).toList();
     }
 
     @Override
     public Optional<VehicleResponseDTO> findByVehicleNumber(String VehicleNumber) {
-        // TODO Auto-generated method stub
-        return Optional.empty();
+        Optional<Vehicle>vehicle=vehicleRepository.findByVehicleNumber(VehicleNumber);
+       if(vehicle.isPresent()){
+       return vehicle.map(this::mapToVehicleDTO);
+       }
+       return Optional.empty();
     }
 
     @Override
     public VehicleResponseDTO updateVehicle(VehicleRequestDTO vehicleRequestDTO, String vehicleNumber) {
-        // TODO Auto-generated method stub
-        return null;
+        Optional<Vehicle> vehicleOptional = vehicleRepository.findByVehicleNumber(vehicleNumber);
+        if (vehicleOptional.isEmpty()) {
+            logger.warn("vehicle not found for update {}", vehicleNumber);
+            throw new IllegalArgumentException("Vehicle not found with number: " + vehicleNumber);
+        }
+        Vehicle vehicle = vehicleOptional.get();
+        vehicle.setVehicleNumber(vehicleRequestDTO.getVehicleNumber());
+        vehicle.setOwnerId(vehicleRequestDTO.getOwnerId());
+        vehicle.setBrand(vehicleRequestDTO.getBrand());
+        vehicle.setVehicleType(vehicleRequestDTO.getVehicleType());
+        vehicle.setTransmissionType(vehicleRequestDTO.getTransmissionType());
+        vehicle.setPricePerDay(vehicleRequestDTO.getPricePerDay());
+        vehicle.setAdvancePayment(vehicleRequestDTO.getAdvancePayment());
+        vehicle.setSecurityPrice(vehicleRequestDTO.getSecurityPrice());
+        vehicle.setManufacturingYear(vehicleRequestDTO.getManufacturingYear());
+        vehicle.setCity(vehicleRequestDTO.getCity());
+        vehicle.setFuelType(vehicleRequestDTO.getFuelType());
+        vehicle.setIsAvailable(vehicleRequestDTO.isAvailable());
+        Vehicle updatedVehicle = vehicleRepository.save(vehicle);
+        logger.info("vehicle updated successfully");
+        return mapToVehicleDTO(updatedVehicle);
     }
     
 }
