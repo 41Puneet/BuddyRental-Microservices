@@ -1,7 +1,9 @@
 package com.user_service.DTO;
-import java.util.UUID;
 import java.time.LocalDateTime;
+import java.util.UUID;
+
 import com.user_service.Enums.Role;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -44,6 +46,9 @@ public class UserDTO {
     }
     public UUID getId() {
         return id;
+    }
+    public void setId(UUID id){
+        this.id=id;
     }
     public String getFullName() {
         return fullName;

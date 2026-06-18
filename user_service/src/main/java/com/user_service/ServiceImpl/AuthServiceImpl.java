@@ -1,23 +1,25 @@
 package com.user_service.ServiceImpl;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import com.user_service.DTO.AuthResponseDTO;
 import com.user_service.DTO.LoginRequestDTO;
 import com.user_service.DTO.RegisterRequestDTO;
-import com.user_service.Service.AuthService;
-import com.user_service.Repository.UserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.authentication.AuthenticationManager;
-import com.user_service.Security.JwtService;
-import com.user_service.Repository.RefreshTokenRepository;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import java.util.UUID;
-import java.time.LocalDateTime;
 import com.user_service.DTO.UserDTO;
-import com.user_service.Service.UserService;
-import org.springframework.security.core.userdetails.UserDetails;
-import com.user_service.Security.CustomUserDetailsService;
 import com.user_service.Entites.RefreshToken;
 import com.user_service.Entites.User;
+import com.user_service.Repository.RefreshTokenRepository;
+import com.user_service.Repository.UserRepository;
+import com.user_service.Security.CustomUserDetailsService;
+import com.user_service.Security.JwtService;
+import com.user_service.Service.AuthService;
+import com.user_service.Service.UserService;
 
 
 @Service
@@ -41,6 +43,7 @@ public class AuthServiceImpl implements AuthService{
     @Override
     public AuthResponseDTO register(RegisterRequestDTO registerRequestDTO) {
        UserDTO userDTO = userService.createUser(registerRequestDTO);
+       System.out.println("User ID = " + userDTO.getId());
        UserDetails userDetails = CustomUserDetailsService.loadUserByUsername(userDTO.getEmail());
        String accessToken = jwtService.generateToken(userDetails);
        RefreshToken refreshToken = createRefreshToken(userDTO.getId());

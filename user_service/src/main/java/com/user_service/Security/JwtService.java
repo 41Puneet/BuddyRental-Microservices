@@ -16,6 +16,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class JwtService {
@@ -25,6 +26,11 @@ public class JwtService {
 
     @Value("${jwt.expiration}")
     private long jwtExpiration;
+
+@PostConstruct
+    public void printSecret() {
+        System.out.println("JWT Secret = " + secretKey);
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

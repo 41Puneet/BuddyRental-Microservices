@@ -1,15 +1,19 @@
 package com.user_service.ServiceImpl;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import com.user_service.DTO.RegisterRequestDTO;
 import com.user_service.DTO.UserDTO;
 import com.user_service.Entites.User;
+import com.user_service.Enums.Role;
 import com.user_service.Repository.UserRepository;
 import com.user_service.Service.UserService;
+
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -40,6 +44,11 @@ public class UserServiceImpl implements UserService {
         user.setEmail(registerRequestDTO.getEmail());
         user.setPhoneNumber(registerRequestDTO.getPhoneNumber());
         user.setPassword(passwordEncoder.encode(registerRequestDTO.getPassword()));
+        user.setRole(
+        registerRequestDTO.getRole() != null
+        ? registerRequestDTO.getRole()
+        : Role.USER
+);
         user.setCreatedAt(registerRequestDTO.getCreatedAt());
         user.setUpdatedAt(registerRequestDTO.getUpdatedAt());
         User savedUser=userRepository.save(user);
@@ -47,7 +56,9 @@ public class UserServiceImpl implements UserService {
     }
     private UserDTO mapToUserDTO(User user){
         if(user==null)return null;
+
         UserDTO userDTO=new UserDTO();
+        userDTO.setId(user.getId());
         userDTO.setFullName(user.getFullName());
         userDTO.setEmail(user.getEmail());
         userDTO.setPhoneNumber(user.getPhoneNumber());
@@ -90,7 +101,7 @@ public class UserServiceImpl implements UserService {
             user.setFullName(userDTO.getFullName());
             user.setEmail(userDTO.getEmail());
             user.setPhoneNumber(userDTO.getPhoneNumber());
-            user.setRole(userDTO.getRole());
+            user.setRole(Role.USER);
             user.setUpdatedAt(userDTO.getUpdatedAt());
             User updatedUser=userRepository.save(user);
             logger.info("updated the user successfully{}",userDTO.getEmail());
