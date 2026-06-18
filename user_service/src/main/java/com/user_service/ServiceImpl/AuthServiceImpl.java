@@ -43,7 +43,6 @@ public class AuthServiceImpl implements AuthService{
     @Override
     public AuthResponseDTO register(RegisterRequestDTO registerRequestDTO) {
        UserDTO userDTO = userService.createUser(registerRequestDTO);
-       System.out.println("User ID = " + userDTO.getId());
        UserDetails userDetails = CustomUserDetailsService.loadUserByUsername(userDTO.getEmail());
        String accessToken = jwtService.generateToken(userDetails);
        RefreshToken refreshToken = createRefreshToken(userDTO.getId());

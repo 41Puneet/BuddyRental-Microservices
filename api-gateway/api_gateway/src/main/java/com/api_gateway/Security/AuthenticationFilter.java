@@ -1,22 +1,33 @@
 package com.api_gateway.Security;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.StringUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 
-@Component
 public class AuthenticationFilter
         extends OncePerRequestFilter {
+
+    private static final List<String> PUBLIC_PATHS = List.of(
+            "/api/auth/register",
+            "/api/auth/login",
+            "/api/auth/refresh-token"
+    );
+
+    private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
 
     private final JwtUtil jwtUtil;
 
@@ -25,31 +36,62 @@ public class AuthenticationFilter
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = getPathWithinApplication(request);
+        return PUBLIC_PATHS.stream().anyMatch(publicPath -> PATH_MATCHER.match(publicPath, path));
+    }
+
+    @Override
+    protected boolean shouldNotFilterAsyncDispatch() {
+        return true;
+    }
+
+    @Override
+    protected boolean shouldNotFilterErrorDispatch() {
+        return true;
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        if (!StringUtils.hasText(authHeader) || !authHeader.startsWith("Bearer ")) {
+            response.sendError(HttpStatus.UNAUTHORIZED.value(), "Missing or invalid Authorization header");
             return;
         }
 
         String token = authHeader.substring(7);
 
         if (!jwtUtil.validateToken(token)) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.sendError(HttpStatus.UNAUTHORIZED.value(), "Invalid or expired token");
             return;
         }
 
         String userId = jwtUtil.extractUserId(token);
-        HttpServletRequest wrappedRequest = new MutableHeaderRequest(request, "X-User-Id", userId);
+
+        HttpServletRequest wrappedRequest =
+                new MutableHeaderRequest(request, "X-User-Id", userId);
+
         filterChain.doFilter(wrappedRequest, response);
     }
 
+    private String getPathWithinApplication(HttpServletRequest request) {
+        String requestUri = request.getRequestURI();
+        String contextPath = request.getContextPath();
+
+        if (StringUtils.hasText(contextPath) && requestUri.startsWith(contextPath)) {
+            return requestUri.substring(contextPath.length());
+        }
+
+        return requestUri;
+    }
+
     private static final class MutableHeaderRequest extends HttpServletRequestWrapper {
-        private final Map<String, String> headers = new HashMap<>();
+        private final Map<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
         private MutableHeaderRequest(HttpServletRequest request, String name, String value) {
             super(request);
@@ -73,7 +115,7 @@ public class AuthenticationFilter
 
         @Override
         public Enumeration<String> getHeaderNames() {
-            Map<String, String> allHeaders = new HashMap<>();
+            Map<String, String> allHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             Enumeration<String> headerNames = super.getHeaderNames();
             while (headerNames.hasMoreElements()) {
                 String headerName = headerNames.nextElement();

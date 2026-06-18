@@ -2,6 +2,7 @@ package com.vehicle_service.VehicleServiceImpl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,7 @@ public class VehicleServiceImpl implements VehicleService{
     }
 
     @Override
-    public VehicleResponseDTO createVehicle(VehicleRequestDTO vehicleRequestDTO) {
+    public VehicleResponseDTO createVehicle(VehicleRequestDTO vehicleRequestDTO,UUID ownerId) {
         Optional<Vehicle> vehicle =
                 vehicleRepository.findByVehicleNumber(vehicleRequestDTO.getVehicleNumber());
         if (vehicle.isPresent()) {
@@ -42,17 +43,18 @@ public class VehicleServiceImpl implements VehicleService{
         }
     Vehicle newVehicle = new Vehicle();
     newVehicle.setVehicleNumber(vehicleRequestDTO.getVehicleNumber());
-    newVehicle.setOwnerId(vehicleRequestDTO.getOwnerId());
+    newVehicle.setOwnerId(ownerId);
     newVehicle.setBrand(vehicleRequestDTO.getBrand());
     newVehicle.setModel(vehicleRequestDTO.getModel());
     newVehicle.setVehicleType(vehicleRequestDTO.getVehicleType());
+    newVehicle.setFuelType(vehicleRequestDTO.getFuelType());
     newVehicle.setTransmissionType(vehicleRequestDTO.getTransmissionType());
     newVehicle.setPricePerDay(vehicleRequestDTO.getPricePerDay());
     newVehicle.setAdvancePayment(vehicleRequestDTO.getAdvancePayment());
     newVehicle.setSecurityPrice(vehicleRequestDTO.getSecurityPrice());
     newVehicle.setManufacturingYear(vehicleRequestDTO.getManufacturingYear());
     newVehicle.setCity(vehicleRequestDTO.getCity());
-    newVehicle.setIsAvailable(true);
+    newVehicle.setIsAvailable(vehicleRequestDTO.getAvailable());
 
     Vehicle savedvehicle=vehicleRepository.save(newVehicle);
       logger.info("vehicle created successfully");
@@ -71,9 +73,9 @@ private VehicleResponseDTO mapToVehicleDTO(Vehicle vehicle){
     vehicleDTO.setManufacturingYear(vehicle.getManufacturingYear());
     vehicleDTO.setCity(vehicle.getCity());
     vehicleDTO.setVehicleType(vehicle.getVehicleType());
-    vehicleDTO.setFuelType(vehicle.getFuelType());
+     vehicleDTO.setFuelType(vehicle.getFuelType());
     vehicleDTO.setTransmissionType(vehicle.getTransmissionType());
-    vehicleDTO.setIsAvailable(true);
+    vehicleDTO.setIsAvailable(vehicle.getIsAvailable());
     return vehicleDTO;
 }
     @Override
@@ -127,10 +129,10 @@ private VehicleResponseDTO mapToVehicleDTO(Vehicle vehicle){
     }
 
     @Override
-    public Page<VehicleResponseDTO> findByModel(String model, Pageable pageable) {
+    public Page<VehicleResponseDTO> findByModel(String brand, Pageable pageable) {
         Pageable page=PageRequest.of(pageable.getPageNumber(),pageable.getPageSize());
-        Page<Vehicle>vehicle=vehicleRepository.findByBrand(model, page);
-        logger.info("vehicle found successfully with model{}",model);
+        Page<Vehicle>vehicle=vehicleRepository.findByBrand(brand, page);
+        logger.info("vehicle found successfully with model{}",brand);
         return vehicle.map(this::mapToVehicleDTO);
 
     }
@@ -159,7 +161,7 @@ private VehicleResponseDTO mapToVehicleDTO(Vehicle vehicle){
     }
 
     @Override
-    public VehicleResponseDTO updateVehicle(VehicleRequestDTO vehicleRequestDTO, String vehicleNumber) {
+    public VehicleResponseDTO updateVehicle(VehicleRequestDTO vehicleRequestDTO, String vehicleNumber,UUID ownerId) {
         Optional<Vehicle> vehicleOptional = vehicleRepository.findByVehicleNumber(vehicleNumber);
         if (vehicleOptional.isEmpty()) {
             logger.warn("vehicle not found for update {}", vehicleNumber);
@@ -167,7 +169,6 @@ private VehicleResponseDTO mapToVehicleDTO(Vehicle vehicle){
         }
         Vehicle vehicle = vehicleOptional.get();
         vehicle.setVehicleNumber(vehicleRequestDTO.getVehicleNumber());
-        vehicle.setOwnerId(vehicleRequestDTO.getOwnerId());
         vehicle.setBrand(vehicleRequestDTO.getBrand());
         vehicle.setModel(vehicleRequestDTO.getModel());
         vehicle.setVehicleType(vehicleRequestDTO.getVehicleType());
@@ -178,7 +179,7 @@ private VehicleResponseDTO mapToVehicleDTO(Vehicle vehicle){
         vehicle.setManufacturingYear(vehicleRequestDTO.getManufacturingYear());
         vehicle.setCity(vehicleRequestDTO.getCity());
         vehicle.setFuelType(vehicleRequestDTO.getFuelType());
-        vehicle.setIsAvailable(vehicleRequestDTO.isAvailable());
+        vehicle.setIsAvailable(vehicleRequestDTO.getAvailable());
         Vehicle updatedVehicle = vehicleRepository.save(vehicle);
         logger.info("vehicle updated successfully");
         return mapToVehicleDTO(updatedVehicle);

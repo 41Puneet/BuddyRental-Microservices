@@ -38,20 +38,18 @@ public class JwtFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
-        System.out.println("Auth Header = " + authHeader);
+        
         String token = null;
-
         String email = null;
 
         // Check Authorization Header
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
 
             token = authHeader.substring(7);
-            System.out.println("Token = " + token);
+           
 
             try {
     email = jwtService.extractUsername(token);
-    System.out.println("Email = " + email);
 } catch (Exception e) {
     e.printStackTrace();
     throw e;

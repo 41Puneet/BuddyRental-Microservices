@@ -1,6 +1,8 @@
 package com.vehicle_service.Controller;
 
 import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,15 +14,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.vehicle_service.DTO.VehicleRequestDTO;
 import com.vehicle_service.DTO.VehicleResponseDTO;
 import com.vehicle_service.Enums.FuelType;
+import com.vehicle_service.Enums.TransmissionType;
 import com.vehicle_service.Enums.VehicleType;
 import com.vehicle_service.Service.VehicleService;
-import com.vehicle_service.Enums.TransmissionType;
+
 import jakarta.validation.Valid;
 
 @RestController
@@ -36,9 +41,12 @@ public class VehicleController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<VehicleResponseDTO> createVehicle(@Valid @RequestBody VehicleRequestDTO vehicleRequestDTO) {
-        return ResponseEntity.ok(vehicleService.createVehicle(vehicleRequestDTO));
-    }
+    public ResponseEntity<?> addVehicle(
+        @RequestBody @Valid VehicleRequestDTO dto,
+        @RequestHeader ("X-User-Id") UUID ownerId) {
+ VehicleResponseDTO vehicle=   vehicleService.createVehicle(dto, ownerId);
+    return ResponseEntity.status(201).body(vehicle);
+}
 
     @GetMapping("/city")
     public ResponseEntity<Page<VehicleResponseDTO>> getVehicleByCity(
@@ -46,7 +54,8 @@ public class VehicleController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(vehicleService.findByCity(city, pageable));
+        Page<VehicleResponseDTO> vehicles=vehicleService.findByCity(city, pageable);
+        return ResponseEntity.status(200).body(vehicles);
     }
 
     @GetMapping("/transmissionType")
@@ -114,8 +123,8 @@ public class VehicleController {
     @PutMapping("/update/{vehicleNumber}")
     public ResponseEntity<VehicleResponseDTO> updateVehicle(
             @PathVariable String vehicleNumber,
-            @Valid @RequestBody VehicleRequestDTO vehicleRequestDTO) {
-        return ResponseEntity.ok(vehicleService.updateVehicle(vehicleRequestDTO, vehicleNumber));
+            @Valid @RequestBody VehicleRequestDTO vehicleRequestDTO,@RequestHeader("X-User-Id")UUID ownerId) {
+        return ResponseEntity.ok(vehicleService.updateVehicle(vehicleRequestDTO, vehicleNumber,ownerId));
     }
 
     @DeleteMapping("/{vehicleNumber}")

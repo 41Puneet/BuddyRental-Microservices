@@ -1,13 +1,16 @@
 package com.vehicle_service.Service;
-import com.vehicle_service.DTO.VehicleResponseDTO;
-import com.vehicle_service.DTO.VehicleRequestDTO;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import java.util.List;
-import com.vehicle_service.Enums.TransmissionType;
+
+import com.vehicle_service.DTO.VehicleRequestDTO;
+import com.vehicle_service.DTO.VehicleResponseDTO;
 import com.vehicle_service.Enums.FuelType;
+import com.vehicle_service.Enums.TransmissionType;
 import com.vehicle_service.Enums.VehicleType;
-import java.util.Optional;
 
 public interface VehicleService {
     Page<VehicleResponseDTO>findByCity(String city,Pageable pageable);
@@ -28,9 +31,9 @@ public interface VehicleService {
 
     Page<VehicleResponseDTO>findByModel(String model,Pageable pageable);
 
-    VehicleResponseDTO createVehicle(VehicleRequestDTO vehicleRequestDTO);
+    VehicleResponseDTO createVehicle(VehicleRequestDTO vehicleRequestDTO,UUID ownerId);
  
-    VehicleResponseDTO updateVehicle(VehicleRequestDTO vehicleRequestDTO,String vehicleNumber);
+    VehicleResponseDTO updateVehicle(VehicleRequestDTO vehicleRequestDTO,String vehicleNumber,UUID ownerId);
 
     void deleteVehicle(String vehicleNumber);
 

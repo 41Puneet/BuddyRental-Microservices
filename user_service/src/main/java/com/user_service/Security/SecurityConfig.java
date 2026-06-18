@@ -11,6 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Configuration
 public class SecurityConfig {
 
@@ -25,27 +27,21 @@ public class SecurityConfig {
             throws Exception {
 
         http
-            .csrf(csrf -> csrf.disable())
-
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-
-            .authorizeHttpRequests(auth -> auth
-
-                .requestMatchers(
-                    "/api/auth/register",
-                    "/api/auth/login",
-                    "/api/auth/refresh-token",
-                    "/api/users/create"
-                ).permitAll()
-
-                .requestMatchers("/admin/**")
-                .hasRole("ADMIN")
-
-                .anyRequest()
-                .authenticated()
-            );
+    .csrf(csrf -> csrf.disable())
+    .authorizeHttpRequests(auth -> auth
+        .requestMatchers(
+            "/api/auth/register",
+            "/api/auth/login",
+            "/api/auth/refresh-token"
+        ).permitAll()
+        .anyRequest().authenticated()
+    )
+    .exceptionHandling(ex ->
+        ex.authenticationEntryPoint((request, response, authException) -> {
+            System.out.println("AUTHENTICATION FAILED");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        })
+    );
 
         http.addFilterBefore(
                 jwtFilter,

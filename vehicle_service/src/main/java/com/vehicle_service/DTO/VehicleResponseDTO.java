@@ -1,5 +1,5 @@
 package com.vehicle_service.DTO;
-
+import java.util.UUID;
 import com.vehicle_service.Enums.FuelType;
 import com.vehicle_service.Enums.TransmissionType;
 import com.vehicle_service.Enums.VehicleType;
@@ -7,7 +7,7 @@ import com.vehicle_service.Enums.VehicleType;
 public class VehicleResponseDTO {
 
     private String vehicleNumber;
-    private String ownerId;
+    private UUID ownerId;
     private String brand;
     private String model;
     private Double pricePerDay;
@@ -23,7 +23,7 @@ public class VehicleResponseDTO {
     public VehicleResponseDTO(){
 
     }
-    public VehicleResponseDTO(String vehicleNumber,String ownerId,String brand,String model,VehicleType vehicleType,FuelType fuelType,TransmissionType transmissionType,Double pricePerDay,Double securityPrice,Double AdvancePayment,Integer manufacturingYear,String city,Boolean isAvailable){
+    public VehicleResponseDTO(String vehicleNumber,UUID ownerId,String brand,String model,VehicleType vehicleType,FuelType fuelType,TransmissionType transmissionType,Double pricePerDay,Double securityPrice,Double AdvancePayment,Integer manufacturingYear,String city,Boolean isAvailable){
         this.vehicleNumber=vehicleNumber;
         this.ownerId=ownerId;
         this.brand=brand;
@@ -47,11 +47,11 @@ public class VehicleResponseDTO {
         this.vehicleNumber = vehicleNumber;
     }
 
-    public String getOwnerId() {
+    public UUID getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(String ownerId) {
+    public void setOwnerId(UUID ownerId) {
         this.ownerId = ownerId;
     }
 
