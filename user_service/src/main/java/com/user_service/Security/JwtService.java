@@ -51,6 +51,22 @@ public class JwtService {
                 .compact();
     }
 
+    public String generateToken(
+            Map<String, Object> extraClaims,
+            String subject) {
+
+        return Jwts.builder()
+                .claims(extraClaims)
+                .subject(subject)
+                .issuedAt(new Date())
+                .expiration(
+                        new Date(
+                                System.currentTimeMillis()
+                                        + jwtExpiration))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
     public boolean validateToken(
             String token,
             UserDetails userDetails) {
@@ -89,7 +105,6 @@ public class JwtService {
     }
 
     private Key getSigningKey() {
-
         byte[] keyBytes =
                 Decoders.BASE64.decode(secretKey);
 

@@ -8,9 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 
 @Component
@@ -24,13 +22,8 @@ public class JwtUtil {
             throw new IllegalStateException("jwt.secret must be configured");
         }
 
-        try {
-            byte[] keyBytes = MessageDigest.getInstance("SHA-256")
-                    .digest(secret.getBytes(StandardCharsets.UTF_8));
-            return Keys.hmacShaKeyFor(keyBytes);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("Unable to derive JWT signing key", e);
-        }
+        byte[] keyBytes = Base64.getDecoder().decode(secret);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public Claims extractClaims(String token) {
@@ -54,6 +47,8 @@ public class JwtUtil {
     }
 
     public String extractUserId(String token) {
-        return extractClaims(token).getSubject();
+        Claims claims = extractClaims(token);
+        String userId = claims.get("userId", String.class);
+        return userId != null ? userId : claims.getSubject();
     }
 }

@@ -22,9 +22,7 @@ public class AuthenticationFilter
         extends OncePerRequestFilter {
 
     private static final List<String> PUBLIC_PATHS = List.of(
-            "/api/auth/register",
-            "/api/auth/login",
-            "/api/auth/refresh-token"
+            "/api/auth/**"
     );
 
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();

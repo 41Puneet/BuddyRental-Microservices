@@ -1,5 +1,7 @@
 package com.user_service.ServiceImpl;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.security.authentication.AuthenticationManager;
@@ -44,7 +46,9 @@ public class AuthServiceImpl implements AuthService{
     public AuthResponseDTO register(RegisterRequestDTO registerRequestDTO) {
        UserDTO userDTO = userService.createUser(registerRequestDTO);
        UserDetails userDetails = CustomUserDetailsService.loadUserByUsername(userDTO.getEmail());
-       String accessToken = jwtService.generateToken(userDetails);
+       Map<String, Object> extraClaims = new HashMap<>();
+       extraClaims.put("userId", userDTO.getId().toString());
+       String accessToken = jwtService.generateToken(extraClaims, userDetails);
        RefreshToken refreshToken = createRefreshToken(userDTO.getId());
        AuthResponseDTO authResponseDTO = new AuthResponseDTO(accessToken, refreshToken.getToken());
        return authResponseDTO;
@@ -68,7 +72,9 @@ public class AuthServiceImpl implements AuthService{
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(),loginRequestDTO.getPassword()));
         User user=userRepository.findByEmail(loginRequestDTO.getEmail()).orElseThrow(()->new IllegalArgumentException("User not found with email: "+loginRequestDTO.getEmail()));
         UserDetails userDetails=CustomUserDetailsService.loadUserByUsername(loginRequestDTO.getEmail());
-        String accessToken=jwtService.generateToken(userDetails);
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("userId", user.getId().toString());
+        String accessToken=jwtService.generateToken(extraClaims, userDetails);
         RefreshToken refreshToken = createRefreshToken(user.getId());
         AuthResponseDTO authResponseDTO = new AuthResponseDTO(accessToken, refreshToken.getToken());
         return authResponseDTO;
@@ -117,7 +123,9 @@ public class AuthServiceImpl implements AuthService{
                     .loadUserByUsername(user.getEmail());
 
     String accessToken =
-            jwtService.generateToken(userDetails);
+            jwtService.generateToken(
+                    Map.of("userId", user.getId().toString()),
+                    userDetails);
 
     AuthResponseDTO response =
             new AuthResponseDTO(accessToken, refreshToken);

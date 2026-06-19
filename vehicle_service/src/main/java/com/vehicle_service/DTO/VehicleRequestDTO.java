@@ -1,6 +1,8 @@
 package com.vehicle_service.DTO;
-import com.vehicle_service.Enums.*;
-import java.util.UUID;
+import com.vehicle_service.Enums.FuelType;
+import com.vehicle_service.Enums.TransmissionType;
+import com.vehicle_service.Enums.VehicleType;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -8,8 +10,6 @@ public class VehicleRequestDTO {
     
     @NotBlank
     private String vehicleNumber;
-    @NotBlank
-    private UUID ownerId;
     @NotBlank
     private String brand;
     private String model;
@@ -37,12 +37,13 @@ public class VehicleRequestDTO {
     public VehicleRequestDTO(){
 
     }
-    public VehicleRequestDTO(String vehicleNumber,UUID ownerId,String brand,String model,String city,VehicleType vehicleType,FuelType fuelType,TransmissionType transmissionType,Double pricePerDay,Double securityPrice,Double advancePayment,Integer manufacturingYear,boolean isAvailable){
+    public VehicleRequestDTO(String vehicleNumber,String brand,String model,String city,VehicleType vehicleType,FuelType fuelType,TransmissionType transmissionType,Double pricePerDay,Double securityPrice,Double advancePayment,Integer manufacturingYear,boolean isAvailable){
         this.vehicleNumber=vehicleNumber;
-        this.ownerId=ownerId;
+        
         this.brand=brand;
         this.model=model;
         this.vehicleType=vehicleType;
+        this.city=city;
         this.fuelType=fuelType;
         this.transmissionType=transmissionType;
         this.pricePerDay=pricePerDay;
@@ -63,12 +64,6 @@ public class VehicleRequestDTO {
     }
     public void setVehicleNumber(String vehicleNumber) {
         this.vehicleNumber = vehicleNumber;
-    }
-    public UUID getOwnerId() {
-        return ownerId;
-    }
-    public void setOwnerId(UUID ownerId) {
-        this.ownerId = ownerId;
     }
     public String getBrand() {
         return brand;
