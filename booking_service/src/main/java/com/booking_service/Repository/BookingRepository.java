@@ -6,12 +6,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking,UUID> {
     Page<Booking>findByUserId(UUID userId,Pageable pageable);
 
     Page<Booking>findByVehicleId(UUID vehicleId,Pageable pageable);
-    
-    Optional<Booking>findByVehicleIdAndStartDate(UUID vehicleId, LocalDateTime startDate);
+
+    List<Booking>findByVehicleId(UUID vehicleId);
+
 
 }
