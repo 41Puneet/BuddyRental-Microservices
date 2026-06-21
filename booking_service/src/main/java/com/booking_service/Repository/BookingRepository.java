@@ -28,4 +28,17 @@ public interface BookingRepository extends JpaRepository<Booking,UUID> {
             """)
 List<Booking>findOverlappingBooking(@Param ("vehicleId")UUID vehicleId,@Param ("startDate")LocalDateTime startDate,@Param("endDate")LocalDateTime endDate);
 
+
+      @Query("""
+        SELECT b FROM Booking b
+        WHERE b.vehicleId=:vehicleId
+        AND b.bookingId<> :bookingId
+        AND b.bookingStatus IN(
+        com.booking_service.Enums.BookingStatus.PENDING,
+        com.booking_service.Enums.BookingStatus.CONFIRMED
+        )
+        AND :startDate<b.endDate
+        AND :endDate>b.startDate
+        """)
+        List<Booking>findOverlappingBooking(@Param ("vehicleId")UUID vehicleId,@Param ("bookingId")UUID bookingId,@Param ("startDate")LocalDateTime startDate,@Param("endDate")LocalDateTime endDate);
 }
