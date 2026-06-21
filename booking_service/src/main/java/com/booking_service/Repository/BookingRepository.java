@@ -40,5 +40,5 @@ List<Booking>findOverlappingBooking(@Param ("vehicleId")UUID vehicleId,@Param ("
         AND :startDate<b.endDate
         AND :endDate>b.startDate
         """)
-        List<Booking>findOverlappingBooking(@Param ("vehicleId")UUID vehicleId,@Param ("bookingId")UUID bookingId,@Param ("startDate")LocalDateTime startDate,@Param("endDate")LocalDateTime endDate);
+        List<Booking>findOverlappingBookingforUpdateBookings(@Param ("vehicleId")UUID vehicleId,@Param ("bookingId")UUID bookingId,@Param ("startDate")LocalDateTime startDate,@Param("endDate")LocalDateTime endDate);
 }

@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import com.booking_service.DTO.VehicleResponseDTO;
 import com.booking_service.DTO.BookingRequestDTO;
@@ -17,9 +18,15 @@ import com.booking_service.DTO.BookingResponseDTO;
 import com.booking_service.FeignClient.VehicleFeignClient;
 import com.booking_service.Repository.BookingRepository;
 import com.booking_service.Service.BookingService;
+
+import jakarta.transaction.Transactional;
+
 import com.booking_service.Entity.Booking;
 import com.booking_service.Enums.BookingStatus;
 
+
+@Service
+@Transactional
 public class BookingServiceImpl implements BookingService{
   
 private final Logger logger=LoggerFactory.getLogger(BookingServiceImpl.class);
@@ -138,35 +145,89 @@ private BookingResponseDTO mapToBookingDTO(Booking booking,VehicleResponseDTO ve
     }
 
     @Override
-    public BookingResponseDTO updateBooking(UUID bookingId, BookingRequestDTO bookingRequestDTO) {
-        Optional<Booking> bookingOptional = bookingRepository.findById(bookingId);
-        if (!bookingOptional.isPresent()) {
-            logger.warn("booking not found with bookingId{}", bookingId);
-            throw new IllegalArgumentException("Booking not found with id" + bookingId);
-        }
-        Booking booking = bookingOptional.get();
+public BookingResponseDTO updateBooking(
+        UUID bookingId,
+        BookingRequestDTO bookingRequestDTO) {
 
-        if (bookingRequestDTO.getEndDate().isBefore(bookingRequestDTO.getStartDate())) {
-            logger.warn("please select valid dates start date={} & end date={}", bookingRequestDTO.getStartDate(), bookingRequestDTO.getEndDate());
-            throw new IllegalArgumentException("End date must be after start date");
-        }
+    Booking booking = bookingRepository.findById(bookingId)
+            .orElseThrow(() -> {
+                logger.warn(
+                        "Booking not found with bookingId={}",
+                        bookingId);
 
-        // If dates or vehicle changed, check availability
-        if (!booking.getStartDate().equals(bookingRequestDTO.getStartDate()) || !booking.getEndDate().equals(bookingRequestDTO.getEndDate()) || !booking.getVehicleId().equals(bookingRequestDTO.getVehicleId())) {
-            checkAvailability(bookingRequestDTO.getVehicleId(), bookingRequestDTO.getStartDate(), bookingRequestDTO.getEndDate());
-        }
+                return new IllegalArgumentException(
+                        "Booking not found with id " + bookingId);
+            });
 
-        booking.setStartDate(bookingRequestDTO.getStartDate());
-        booking.setEndDate(bookingRequestDTO.getEndDate());
-        booking.setVehicleId(bookingRequestDTO.getVehicleId());
-
-        VehicleResponseDTO vehicle = vehicleFeignClient.getVehicleById(booking.getVehicleId());
-        long days = ChronoUnit.DAYS.between(booking.getStartDate().toLocalDate(), booking.getEndDate().toLocalDate());
-        booking.setTotalAmount(vehicle.getPricePerDay() * days);
-
-        Booking updated = bookingRepository.save(booking);
-        logger.info("booking updated successfully for bookingId{}", bookingId);
-        return mapToBookingDTO(updated, vehicle);
+    if (booking.getBookingStatus() == BookingStatus.CANCELLED) {
+        throw new IllegalArgumentException(
+                "Cancelled booking cannot be updated");
     }
-    
+
+    if (bookingRequestDTO.getEndDate()
+            .isBefore(bookingRequestDTO.getStartDate())) {
+
+        logger.warn(
+                "Invalid booking dates. startDate={}, endDate={}",
+                bookingRequestDTO.getStartDate(),
+                bookingRequestDTO.getEndDate());
+
+        throw new IllegalArgumentException(
+                "End date must be after start date");
+    }
+
+    if (!booking.getVehicleId().equals(bookingRequestDTO.getVehicleId())
+            || !booking.getStartDate().equals(bookingRequestDTO.getStartDate())
+            || !booking.getEndDate().equals(bookingRequestDTO.getEndDate())) {
+
+        checkAvailabilityforUpdate(
+                bookingRequestDTO.getVehicleId(),
+                bookingId,
+                bookingRequestDTO.getStartDate(),
+                bookingRequestDTO.getEndDate());
+    }
+
+    VehicleResponseDTO vehicle =
+            vehicleFeignClient.getVehicleById(
+                    bookingRequestDTO.getVehicleId());
+
+    booking.setVehicleId(
+            bookingRequestDTO.getVehicleId());
+
+    booking.setStartDate(
+            bookingRequestDTO.getStartDate());
+
+    booking.setEndDate(
+            bookingRequestDTO.getEndDate());
+
+    long days = ChronoUnit.DAYS.between(
+            bookingRequestDTO.getStartDate().toLocalDate(),
+            bookingRequestDTO.getEndDate().toLocalDate());
+
+    if (days <= 0) {
+        days = 1;
+    }
+
+    booking.setTotalAmount(
+            vehicle.getPricePerDay() * days);
+
+    Booking updatedBooking =
+            bookingRepository.save(booking);
+
+    logger.info(
+            "Booking updated successfully. bookingId={}",
+            bookingId);
+
+    return mapToBookingDTO(
+            updatedBooking,
+            vehicle);
+}
+    private void checkAvailabilityforUpdate(UUID vehicleId,UUID bookingId,LocalDateTime startDate,LocalDateTime endDate){
+        List<Booking>overlapping=bookingRepository.findOverlappingBookingforUpdateBookings(vehicleId, bookingId, startDate, endDate);
+        if(!overlapping.isEmpty()){
+            logger.warn("vehicle{} is already booked between {} and {}"+vehicleId,startDate,endDate);
+         throw new IllegalArgumentException("Vehicle is not available for the selected range");
+
+        }
+    }
 }

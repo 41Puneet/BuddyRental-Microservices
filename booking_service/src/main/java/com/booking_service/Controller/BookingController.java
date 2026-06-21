@@ -1,7 +1,6 @@
 package com.booking_service.Controller;
 
 import java.util.UUID;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.booking_service.DTO.BookingResponseDTO;
 import com.booking_service.DTO.BookingRequestDTO;
 import com.booking_service.Service.BookingService;
-
 import jakarta.validation.Valid;
 
 
@@ -35,54 +33,38 @@ public class BookingController {
     }
 
     @PostMapping
-    public ResponseEntity<BookingResponseDTO> createBooking(
-            @Valid @RequestBody BookingRequestDTO request,
-            @RequestHeader("X-User-Id") UUID userId){
+    public ResponseEntity<BookingResponseDTO> createBooking(@Valid @RequestBody BookingRequestDTO request, @RequestHeader("X-User-Id") UUID userId){
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(bookingService.createBooking(request, userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.createBooking(request, userId));
     }
 
     @PutMapping("/{bookingId}")
-    public ResponseEntity<BookingResponseDTO> updateBooking(
-            @PathVariable UUID bookingId,
-            @Valid @RequestBody BookingRequestDTO request){
+    public ResponseEntity<BookingResponseDTO> updateBooking(@PathVariable UUID bookingId,@Valid @RequestBody BookingRequestDTO request){
 
-        return ResponseEntity.ok(
-                bookingService.updateBooking(bookingId, request));
+        return ResponseEntity.ok(bookingService.updateBooking(bookingId, request));
     }
 
     @DeleteMapping("/{bookingId}")
-    public ResponseEntity<BookingResponseDTO> cancelBooking(
-            @PathVariable UUID bookingId){
+    public ResponseEntity<BookingResponseDTO> cancelBooking( @PathVariable UUID bookingId){
 
-        return ResponseEntity.ok(
-                bookingService.cancelBooking(bookingId));
+        return ResponseEntity.ok(bookingService.cancelBooking(bookingId));
     }
 
     @GetMapping("/{bookingId}")
-    public ResponseEntity<BookingResponseDTO> getBookingById(
-            @PathVariable UUID bookingId){
+    public ResponseEntity<BookingResponseDTO> getBookingById(@PathVariable UUID bookingId){
 
-        return ResponseEntity.ok(
-                bookingService.getBookingById(bookingId));
+        return ResponseEntity.ok( bookingService.getBookingById(bookingId));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Page<BookingResponseDTO>> getBookingsByUser(
-            @PathVariable UUID userId,
-            Pageable pageable){
+    public ResponseEntity<Page<BookingResponseDTO>> getBookingsByUser( @PathVariable UUID userId,Pageable pageable){
 
-        return ResponseEntity.ok(
-                bookingService.findByUserId(userId, pageable));
+        return ResponseEntity.ok(bookingService.findByUserId(userId, pageable));
     }
 
     @GetMapping("/vehicle/{vehicleId}")
-    public ResponseEntity<Page<BookingResponseDTO>> getBookingsByVehicle(
-            @PathVariable UUID vehicleId,
-            Pageable pageable){
+    public ResponseEntity<Page<BookingResponseDTO>> getBookingsByVehicle(@PathVariable UUID vehicleId,Pageable pageable){
 
-        return ResponseEntity.ok(
-                bookingService.findByVehicleId(vehicleId, pageable));
+        return ResponseEntity.ok(bookingService.findByVehicleId(vehicleId, pageable));
     }
 }
