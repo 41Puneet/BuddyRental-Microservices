@@ -22,6 +22,7 @@ public interface VehicleService {
     List<VehicleResponseDTO>findByFuelTypeAndTransmissionType(FuelType fuelType,TransmissionType transmissionType);
 
     Optional<VehicleResponseDTO>findByVehicleNumber(String VehicleNumber);
+    Optional<VehicleResponseDTO>findByVehicleId(UUID vehicleId);
 
     Page<VehicleResponseDTO>findByManufacturingYear(Integer manufacturingYear,Pageable pageable);
 

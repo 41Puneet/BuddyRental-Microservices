@@ -10,6 +10,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.PrePersist;
 
 
 
@@ -19,6 +21,8 @@ public class Vehicle {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long vehicleId;
+    @Column(nullable = false, unique = true, updatable = false)
+    private UUID externalVehicleId;
     private String vehicleNumber;
     private UUID ownerId;
     private String brand;
@@ -42,6 +46,7 @@ public class Vehicle {
     }
     public Vehicle(Long vehicleId,String vehicleNumber,UUID ownerId,String brand,String model,VehicleType vehicleType,FuelType fuelType,TransmissionType transmissionType,Double pricePerDay,Double securityPrice,Double AdvancePayment,Integer manufacturingYear,String city,boolean isAvailable){
         this.vehicleId=vehicleId;
+        this.externalVehicleId=UUID.randomUUID();
         this.vehicleNumber=vehicleNumber;
         this.ownerId=ownerId;
         this.brand=brand;
@@ -94,6 +99,14 @@ public class Vehicle {
     }
     public void setVehicleId(Long vehicleId) {
         this.vehicleId = vehicleId;
+    }
+
+    public UUID getExternalVehicleId() {
+        return externalVehicleId;
+    }
+
+    public void setExternalVehicleId(UUID externalVehicleId) {
+        this.externalVehicleId = externalVehicleId;
     }
     public VehicleType getVehicleType() {
         return vehicleType;
@@ -166,6 +179,12 @@ public class Vehicle {
     public void setIsAvailable(boolean isAvailable) {
         this.isAvailable = isAvailable;
     }
+
+    @PrePersist
+    public void ensureExternalVehicleId() {
+        if (externalVehicleId == null) {
+            externalVehicleId = UUID.randomUUID();
+        }
+    }
     
     }
-

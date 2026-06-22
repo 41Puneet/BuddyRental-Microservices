@@ -1,0 +1,639 @@
+{
+  "info": {
+    "_postman_id": "d8d6b9c8-8d0d-4e92-a8c0-buddyrentalapitest",
+    "name": "BuddyRental API Testing Suite",
+    "description": "Complete API test suite for BuddyRental microservices. The service-registry and api-gateway modules are infra-only in the current codebase, so only business controllers are included here.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url_user", "value": "http://localhost:8081" },
+    { "key": "base_url_vehicle", "value": "http://localhost:8082" },
+    { "key": "base_url_booking", "value": "http://localhost:8083" },
+    { "key": "base_url_payment", "value": "http://localhost:8084" },
+    { "key": "access_token", "value": "" },
+    { "key": "refresh_token", "value": "" },
+    { "key": "user_id", "value": "11111111-1111-1111-1111-111111111111" },
+    { "key": "owner_id", "value": "11111111-1111-1111-1111-111111111111" },
+    { "key": "vehicle_id", "value": "44444444-4444-4444-4444-444444444444" },
+    { "key": "booking_id", "value": "55555555-5555-5555-5555-555555555555" },
+    { "key": "payment_id", "value": "77777777-7777-7777-7777-777777777777" },
+    { "key": "vehicle_number", "value": "KL07AB1234" },
+    { "key": "transaction_id", "value": "txn_test_123456789" },
+    { "key": "razorpay_order_id", "value": "order_test_123" },
+    { "key": "razorpay_payment_id", "value": "pay_test_123" },
+    { "key": "razorpay_signature", "value": "signature_test_123" }
+  ],
+  "item": [
+    {
+      "name": "User Service",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Aarav Sharma\",\n  \"email\": \"aarav@example.com\",\n  \"phoneNumber\": \"+919876543210\",\n  \"password\": \"Password123\",\n  \"role\": \"USER\"\n}"
+            },
+            "url": { "raw": "{{base_url_user}}/api/auth/register" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const body = pm.response.json();",
+                  "pm.environment.set('access_token', body.accessToken);",
+                  "pm.environment.set('refresh_token', body.refreshToken);",
+                  "if (body.accessToken) {",
+                  "  const parts = body.accessToken.split('.');",
+                  "  if (parts.length === 3) {",
+                  "    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');",
+                  "    const padded = base64 + '==='.slice((base64.length + 3) % 4);",
+                  "    const payload = JSON.parse(atob(padded));",
+                  "    if (payload.userId) pm.environment.set('user_id', payload.userId);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"aarav@example.com\",\n  \"password\": \"Password123\"\n}"
+            },
+            "url": { "raw": "{{base_url_user}}/api/auth/login" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const body = pm.response.json();",
+                  "pm.environment.set('access_token', body.accessToken);",
+                  "pm.environment.set('refresh_token', body.refreshToken);",
+                  "if (body.accessToken) {",
+                  "  const parts = body.accessToken.split('.');",
+                  "  if (parts.length === 3) {",
+                  "    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');",
+                  "    const padded = base64 + '==='.slice((base64.length + 3) % 4);",
+                  "    const payload = JSON.parse(atob(padded));",
+                  "    if (payload.userId) pm.environment.set('user_id', payload.userId);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{base_url_user}}/api/auth/refresh-token?refreshToken={{refresh_token}}" }
+          }
+        },
+        {
+          "name": "Logout User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "\"{{refresh_token}}\""
+            },
+            "url": { "raw": "{{base_url_user}}/api/auth/logout" }
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Meera Nair\",\n  \"email\": \"meera@example.com\",\n  \"phoneNumber\": \"+919812345678\",\n  \"password\": \"Password123\",\n  \"role\": \"USER\"\n}"
+            },
+            "url": { "raw": "{{base_url_user}}/api/users/create" }
+          }
+        },
+        {
+          "name": "Get User By Email",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": { "raw": "{{base_url_user}}/api/users/email/aarav@example.com" }
+          }
+        },
+        {
+          "name": "Get User By Phone",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": { "raw": "{{base_url_user}}/api/users/phone?phoneNumber=%2B919876543210" }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{user_id}}\",\n  \"fullName\": \"Aarav Sharma\",\n  \"email\": \"aarav.updated@example.com\",\n  \"phoneNumber\": \"+919876543210\",\n  \"role\": \"USER\",\n  \"profilePicture\": \"https://cdn.example.com/profile/aarav.png\",\n  \"isVerified\": true,\n  \"rating\": 4.9\n}"
+            },
+            "url": { "raw": "{{base_url_user}}/api/users/update/{{user_id}}" }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": { "raw": "{{base_url_user}}/api/users/delete/{{user_id}}" }
+          }
+        },
+        {
+          "name": "Invalid Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"missing@example.com\",\n  \"password\": \"badpass\"\n}"
+            },
+            "url": { "raw": "{{base_url_user}}/api/auth/login" }
+          }
+        },
+        {
+          "name": "Missing Fields Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"missing@example.com\"\n}"
+            },
+            "url": { "raw": "{{base_url_user}}/api/auth/register" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vehicle Service",
+      "item": [
+        {
+          "name": "Add Vehicle",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "{{owner_id}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicleNumber\": \"KL07AB1234\",\n  \"brand\": \"Toyota\",\n  \"model\": \"Innova\",\n  \"city\": \"Bengaluru\",\n  \"vehicleType\": \"CAR\",\n  \"fuelType\": \"PETROL\",\n  \"transmissionType\": \"AUTOMATIC\",\n  \"pricePerDay\": 1200,\n  \"securityPrice\": 5000,\n  \"advancePayment\": 1000,\n  \"manufacturingYear\": 2023\n}"
+            },
+            "url": { "raw": "{{base_url_vehicle}}/api/vehicles/create" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "if (body.vehicleNumber) pm.environment.set('vehicle_number', body.vehicleNumber);",
+                  "if (body.ownerId) pm.environment.set('owner_id', body.ownerId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Vehicle By City",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url_vehicle}}/api/vehicles/city?city=Bengaluru&page=0&size=10" }
+          }
+        },
+        {
+          "name": "Get Vehicle By Transmission Type",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url_vehicle}}/api/vehicles/transmissionType?transmissionType=AUTOMATIC" }
+          }
+        },
+        {
+          "name": "Get Vehicle By Fuel Type and Vehicle Type",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url_vehicle}}/api/vehicles/fuelType?fuelType=PETROL&vehicleType=CAR" }
+          }
+        },
+        {
+          "name": "Get Vehicle By Fuel Type and Transmission Type",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url_vehicle}}/api/vehicles/fuelTransmission?fuelType=PETROL&transmissionType=AUTOMATIC" }
+          }
+        },
+        {
+          "name": "Get Vehicle By Vehicle Number",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url_vehicle}}/api/vehicles/vehicleNumber?vehicleNumber={{vehicle_number}}" }
+          }
+        },
+        {
+          "name": "Get Vehicle By Manufacturing Year",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url_vehicle}}/api/vehicles/manufacturingYear?manufacturingYear=2023&page=0&size=10" }
+          }
+        },
+        {
+          "name": "Get Vehicle By Brand",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url_vehicle}}/api/vehicles/brand?brand=Toyota&page=0&size=10" }
+          }
+        },
+        {
+          "name": "Get Vehicle By Price Between",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url_vehicle}}/api/vehicles/priceBetween?minPrice=1000&maxPrice=2000&page=0&size=10" }
+          }
+        },
+        {
+          "name": "Get Vehicle By Model",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url_vehicle}}/api/vehicles/model?model=Innova&page=0&size=10" }
+          }
+        },
+        {
+          "name": "Update Vehicle",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "X-User-Id", "value": "{{owner_id}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicleNumber\": \"KL07AB1234\",\n  \"brand\": \"Toyota\",\n  \"model\": \"Innova Crysta\",\n  \"city\": \"Bengaluru\",\n  \"vehicleType\": \"CAR\",\n  \"fuelType\": \"PETROL\",\n  \"transmissionType\": \"AUTOMATIC\",\n  \"pricePerDay\": 1300,\n  \"securityPrice\": 5000,\n  \"advancePayment\": 1000,\n  \"manufacturingYear\": 2023\n}"
+            },
+            "url": { "raw": "{{base_url_vehicle}}/api/vehicles/update/{{vehicle_number}}" }
+          }
+        },
+        {
+          "name": "Delete Vehicle",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url_vehicle}}/api/vehicles/{{vehicle_number}}" }
+          }
+        },
+        {
+          "name": "Invalid Owner Header",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "not-a-uuid" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicleNumber\": \"KL07AB1234\",\n  \"brand\": \"Toyota\",\n  \"model\": \"Innova\",\n  \"city\": \"Bengaluru\",\n  \"vehicleType\": \"CAR\",\n  \"fuelType\": \"PETROL\",\n  \"transmissionType\": \"AUTOMATIC\",\n  \"pricePerDay\": 1200,\n  \"manufacturingYear\": 2023\n}"
+            },
+            "url": { "raw": "{{base_url_vehicle}}/api/vehicles/create" }
+          }
+        },
+        {
+          "name": "Missing Vehicle Fields",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "{{owner_id}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicleNumber\": \"KL07AB1234\"\n}"
+            },
+            "url": { "raw": "{{base_url_vehicle}}/api/vehicles/create" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Booking Service",
+      "item": [
+        {
+          "name": "Create Booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "{{user_id}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"vehicleId\": \"{{vehicle_id}}\",\n  \"startDate\": \"2026-06-25T10:00:00\",\n  \"endDate\": \"2026-06-28T10:00:00\"\n}"
+            },
+            "url": { "raw": "{{base_url_booking}}/api/bookings" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "if (body.bookingId) pm.environment.set('booking_id', body.bookingId);",
+                  "if (body.vehicle && body.vehicle.vehicleId) pm.environment.set('vehicle_id', body.vehicle.vehicleId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Booking - Vehicle Unavailable",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "{{user_id}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"vehicleId\": \"{{vehicle_id}}\",\n  \"startDate\": \"2026-06-25T10:00:00\",\n  \"endDate\": \"2026-06-28T10:00:00\"\n}"
+            },
+            "url": { "raw": "{{base_url_booking}}/api/bookings" }
+          }
+        },
+        {
+          "name": "Get Booking By Id",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url_booking}}/api/bookings/{{booking_id}}" }
+          }
+        },
+        {
+          "name": "Get Bookings By User",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url_booking}}/api/bookings/user/{{user_id}}?page=0&size=10" }
+          }
+        },
+        {
+          "name": "Get Bookings By Vehicle",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url_booking}}/api/bookings/vehicle/{{vehicle_id}}?page=0&size=10" }
+          }
+        },
+        {
+          "name": "Update Booking",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"vehicleId\": \"{{vehicle_id}}\",\n  \"startDate\": \"2026-06-26T10:00:00\",\n  \"endDate\": \"2026-06-29T10:00:00\"\n}"
+            },
+            "url": { "raw": "{{base_url_booking}}/api/bookings/update/{{booking_id}}" }
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url_booking}}/api/bookings/{{booking_id}}" }
+          }
+        },
+        {
+          "name": "Update Booking Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "\"CONFIRMED\""
+            },
+            "url": { "raw": "{{base_url_booking}}/api/bookings/updateStatus/{{booking_id}}" }
+          }
+        },
+        {
+          "name": "Missing Booking Fields",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "{{user_id}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{user_id}}\"\n}"
+            },
+            "url": { "raw": "{{base_url_booking}}/api/bookings" }
+          }
+        },
+        {
+          "name": "Invalid UUID Header",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "not-a-uuid" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"vehicleId\": \"{{vehicle_id}}\",\n  \"startDate\": \"2026-06-25T10:00:00\",\n  \"endDate\": \"2026-06-28T10:00:00\"\n}"
+            },
+            "url": { "raw": "{{base_url_booking}}/api/bookings" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payment Service",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "{{user_id}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": \"{{booking_id}}\"\n}"
+            },
+            "url": { "raw": "{{base_url_payment}}/api/payments/create-order" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const body = pm.response.json();",
+                  "if (body.orderId) pm.environment.set('razorpay_order_id', body.orderId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verify Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "{{user_id}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": \"{{booking_id}}\",\n  \"razorpayPaymentId\": \"{{razorpay_payment_id}}\",\n  \"razorpayOrderId\": \"{{razorpay_order_id}}\",\n  \"razorpaySignature\": \"{{razorpay_signature}}\"\n}"
+            },
+            "url": { "raw": "{{base_url_payment}}/api/payments/verifyPayment" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const body = pm.response.json();",
+                  "if (body.paymentId) pm.environment.set('payment_id', body.paymentId);",
+                  "if (body.transactionId) pm.environment.set('transaction_id', body.transactionId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verify Payment - Already Exists",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "{{user_id}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": \"{{booking_id}}\",\n  \"razorpayPaymentId\": \"{{razorpay_payment_id}}\",\n  \"razorpayOrderId\": \"{{razorpay_order_id}}\",\n  \"razorpaySignature\": \"{{razorpay_signature}}\"\n}"
+            },
+            "url": { "raw": "{{base_url_payment}}/api/payments/verifyPayment" }
+          }
+        },
+        {
+          "name": "Get Payment By Id",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url_payment}}/api/payments/{{payment_id}}" }
+          }
+        },
+        {
+          "name": "Get Payment By Booking Id",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url_payment}}/api/payments/booking/{{booking_id}}" }
+          }
+        },
+        {
+          "name": "Get Payment By Transaction Id",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url_payment}}/api/payments/transaction/{{transaction_id}}" }
+          }
+        },
+        {
+          "name": "Get Payments By User",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-User-Id", "value": "{{user_id}}" }
+            ],
+            "url": { "raw": "{{base_url_payment}}/api/payments/user/{{user_id}}?page=0&size=10" }
+          }
+        },
+        {
+          "name": "Missing Payment Fields",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "{{user_id}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": { "raw": "{{base_url_payment}}/api/payments/verifyPayment" }
+          }
+        },
+        {
+          "name": "Invalid User ID Header",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "not-a-uuid" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": \"{{booking_id}}\"\n}"
+            },
+            "url": { "raw": "{{base_url_payment}}/api/payments/create-order" }
+          }
+        }
+      ]
+    }
+  ]
+}

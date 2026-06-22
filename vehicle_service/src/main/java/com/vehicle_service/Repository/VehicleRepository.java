@@ -7,6 +7,7 @@ import java.util.List;
 import com.vehicle_service.Enums.FuelType;
 import com.vehicle_service.Enums.VehicleType;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 
 
@@ -21,6 +22,7 @@ public interface VehicleRepository extends JpaRepository<Vehicle,Long> {
     List<Vehicle>findByFuelTypeAndTransmissionType(FuelType fuelType,TransmissionType transmissionType);
 
     Optional<Vehicle>findByVehicleNumber(String VehicleNumber);
+    Optional<Vehicle>findByExternalVehicleId(UUID externalVehicleId);
 
     Page<Vehicle>findByManufacturingYear(Integer manufacturingYear,Pageable pageable);
 

@@ -48,6 +48,13 @@ public class VehicleController {
     return ResponseEntity.status(201).body(vehicle);
 }
 
+    @GetMapping("/{vehicleId}")
+    public ResponseEntity<VehicleResponseDTO> getVehicleById(@PathVariable UUID vehicleId) {
+        return vehicleService.findByVehicleId(vehicleId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/city")
     public ResponseEntity<Page<VehicleResponseDTO>> getVehicleByCity(
             @RequestParam String city,

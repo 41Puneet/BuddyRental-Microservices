@@ -6,6 +6,7 @@ import com.vehicle_service.Enums.VehicleType;
 
 public class VehicleResponseDTO {
 
+    private UUID vehicleId;
     private String vehicleNumber;
     private UUID ownerId;
     private String brand;
@@ -23,7 +24,8 @@ public class VehicleResponseDTO {
     public VehicleResponseDTO(){
 
     }
-    public VehicleResponseDTO(String vehicleNumber,UUID ownerId,String brand,String model,VehicleType vehicleType,FuelType fuelType,TransmissionType transmissionType,Double pricePerDay,Double securityPrice,Double AdvancePayment,Integer manufacturingYear,String city,Boolean isAvailable){
+    public VehicleResponseDTO(UUID vehicleId,String vehicleNumber,UUID ownerId,String brand,String model,VehicleType vehicleType,FuelType fuelType,TransmissionType transmissionType,Double pricePerDay,Double securityPrice,Double AdvancePayment,Integer manufacturingYear,String city,Boolean isAvailable){
+        this.vehicleId=vehicleId;
         this.vehicleNumber=vehicleNumber;
         this.ownerId=ownerId;
         this.brand=brand;
@@ -45,6 +47,14 @@ public class VehicleResponseDTO {
 
     public void setVehicleNumber(String vehicleNumber) {
         this.vehicleNumber = vehicleNumber;
+    }
+
+    public UUID getVehicleId() {
+        return vehicleId;
+    }
+
+    public void setVehicleId(UUID vehicleId) {
+        this.vehicleId = vehicleId;
     }
 
     public UUID getOwnerId() {

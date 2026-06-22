@@ -42,6 +42,7 @@ public class VehicleServiceImpl implements VehicleService{
             throw new IllegalArgumentException("Vehicle already exists with number: " + vehicleRequestDTO.getVehicleNumber());
         }
     Vehicle newVehicle = new Vehicle();
+    newVehicle.setExternalVehicleId(UUID.randomUUID());
     newVehicle.setVehicleNumber(vehicleRequestDTO.getVehicleNumber());
     newVehicle.setOwnerId(ownerId);
     newVehicle.setBrand(vehicleRequestDTO.getBrand());
@@ -63,6 +64,7 @@ public class VehicleServiceImpl implements VehicleService{
 private VehicleResponseDTO mapToVehicleDTO(Vehicle vehicle){
     if(vehicle==null)return null;
     VehicleResponseDTO vehicleDTO=new VehicleResponseDTO();
+    vehicleDTO.setVehicleId(vehicle.getExternalVehicleId());
     vehicleDTO.setVehicleNumber(vehicle.getVehicleNumber());
     vehicleDTO.setOwnerId(vehicle.getOwnerId());
     vehicleDTO.setBrand(vehicle.getBrand());
@@ -87,6 +89,12 @@ private VehicleResponseDTO mapToVehicleDTO(Vehicle vehicle){
         }
         vehicleRepository.delete(vehicle.get());
         logger.info("vehicle deleted successfully");
+    }
+
+    @Override
+    public Optional<VehicleResponseDTO> findByVehicleId(UUID vehicleId) {
+        Optional<Vehicle> vehicle = vehicleRepository.findByExternalVehicleId(vehicleId);
+        return vehicle.map(this::mapToVehicleDTO);
     }
 
     @Override
