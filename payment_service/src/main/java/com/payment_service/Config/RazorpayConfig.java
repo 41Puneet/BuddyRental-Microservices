@@ -9,19 +9,16 @@ import com.razorpay.RazorpayException;
 
 @Configuration
 public class RazorpayConfig {
-
-    @Value("${razorpay.key.id}")
+    
+   @Value("${razorpay.key.id}")
     private String keyId;
 
     @Value("${razorpay.key.secret}")
     private String keySecret;
 
+
     @Bean
-    public RazorpayClient razorpayClient() {
-        try {
-            return new RazorpayClient(keyId, keySecret);
-        } catch (RazorpayException e) {
-            throw new IllegalStateException("Unable to create Razorpay client", e);
-        }
+    public RazorpayClient razorpayClient () throws RazorpayException{
+        return new RazorpayClient(keyId, keySecret);
     }
 }

@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.payment_service.DTO.CreateOrderDTO;
 import com.payment_service.DTO.PaymentRequestDTO;
+import com.payment_service.DTO.PaymentRequestVerificationDTO;
 import com.payment_service.DTO.PaymentResponseDTO;
 import com.payment_service.DTO.RazorpayOrderResponseDTO;
 import com.payment_service.Service.PaymentService;
@@ -32,16 +34,16 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @PostMapping
-    public ResponseEntity<PaymentResponseDTO> createPayment(
-            @Valid @RequestBody PaymentRequestDTO paymentRequestDTO,
-            @RequestParam("userId") UUID userId) {
-        return ResponseEntity.ok(paymentService.createPayment(paymentRequestDTO, userId));
+    @PostMapping("/verifyPayment")
+    public ResponseEntity<PaymentResponseDTO> verifyPayment(
+            @Valid @RequestBody PaymentRequestVerificationDTO paymentRequestDTO,
+            @RequestHeader("X-User-Id") UUID userId) {
+        return ResponseEntity.ok(paymentService.verifyPayment(paymentRequestDTO, userId));
     }
 
     @PostMapping("/create-order")
-    public ResponseEntity<RazorpayOrderResponseDTO> createOrder(@Valid @RequestBody CreateOrderDTO createOrderDTO,UUID userId) throws RazorpayException {
-        return ResponseEntity.ok(paymentService.createOrder(createOrderDTO.getBookingId(), userId));
+    public ResponseEntity<RazorpayOrderResponseDTO> createOrder(@Valid @RequestBody CreateOrderDTO createOrderDTO,@RequestHeader("X-User-Id")UUID userId) throws RazorpayException {
+        return ResponseEntity.ok(paymentService.createOrder(createOrderDTO.getBookingId(),userId ));
     }
 
     @GetMapping("/{paymentId}")
@@ -61,7 +63,7 @@ public class PaymentController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<PaymentResponseDTO>> getPaymentsByUserId(
-            @PathVariable UUID userId,
+            @RequestHeader("X-User-Id")UUID userId,
             Pageable pageable) {
         return ResponseEntity.ok(paymentService.findPaymentByUserId(userId, pageable));
     }

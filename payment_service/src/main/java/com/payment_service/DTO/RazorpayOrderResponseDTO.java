@@ -1,17 +1,19 @@
 package com.payment_service.DTO;
 
-import java.util.UUID;
-
 public class RazorpayOrderResponseDTO {
+    
 
     private String orderId;
-    private Long amount;
+    private Double amount;
     private String currency;
-    private String receipt;
-    private UUID bookingId;
-    private UUID userId;
 
-    public RazorpayOrderResponseDTO() {
+    public RazorpayOrderResponseDTO(){
+
+    }
+    public RazorpayOrderResponseDTO(String orderId,Double amount,String currency){
+        this.orderId=orderId;
+        this.amount=amount;
+        this.currency=currency;
     }
 
     public String getOrderId() {
@@ -22,11 +24,11 @@ public class RazorpayOrderResponseDTO {
         this.orderId = orderId;
     }
 
-    public Long getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(Long amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 
@@ -38,27 +40,4 @@ public class RazorpayOrderResponseDTO {
         this.currency = currency;
     }
 
-    public String getReceipt() {
-        return receipt;
-    }
-
-    public void setReceipt(String receipt) {
-        this.receipt = receipt;
-    }
-
-    public UUID getBookingId() {
-        return bookingId;
-    }
-
-    public void setBookingId(UUID bookingId) {
-        this.bookingId = bookingId;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
-    }
 }

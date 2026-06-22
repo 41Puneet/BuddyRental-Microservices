@@ -5,14 +5,13 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
+import com.payment_service.DTO.PaymentRequestVerificationDTO;
 import com.payment_service.DTO.PaymentRequestDTO;
 import com.payment_service.DTO.PaymentResponseDTO;
 import com.payment_service.DTO.RazorpayOrderResponseDTO;
 import com.razorpay.RazorpayException;
 
 public interface PaymentService {
-    PaymentResponseDTO createPayment(PaymentRequestDTO paymentRequestDTO,UUID userId);
 
     PaymentResponseDTO getPaymentById(UUID paymentId);
 
@@ -24,4 +23,5 @@ public interface PaymentService {
     
     RazorpayOrderResponseDTO createOrder(UUID bookingId, UUID userId) throws RazorpayException;
     
+    PaymentResponseDTO verifyPayment(PaymentRequestVerificationDTO dto, UUID userId);
 }
