@@ -1,11 +1,11 @@
 package com.payment_service.DTO;
 import java.util.UUID;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 
 public class PaymentRequestDTO {
-    @NotBlank
+    @NotNull
     private UUID bookingId;
 
 public PaymentRequestDTO(){

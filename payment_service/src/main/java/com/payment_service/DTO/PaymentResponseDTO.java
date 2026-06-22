@@ -20,14 +20,7 @@ public class PaymentResponseDTO {
     public PaymentResponseDTO() {
     }
 
-    public PaymentResponseDTO(UUID paymentId,
-                              UUID bookingId,
-                              UUID userId,
-                              String transactionId,
-                              Double amount,
-                              PaymentStatus paymentStatus,
-                              LocalDateTime createdAt,
-                              BookingResponseDTO booking) {
+    public PaymentResponseDTO(UUID paymentId, UUID bookingId, UUID userId, String transactionId, Double amount, PaymentStatus paymentStatus, LocalDateTime createdAt, BookingResponseDTO booking) {
         this.paymentId = paymentId;
         this.bookingId = bookingId;
         this.userId = userId;
