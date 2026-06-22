@@ -1,6 +1,7 @@
 package com.booking_service.Service;
 
 
+import com.booking_service.Enums.BookingStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import java.util.UUID;
@@ -20,5 +21,5 @@ public interface BookingService {
 
     BookingResponseDTO getBookingById(UUID bookingId);
 
-
+    BookingResponseDTO updateBookingStatus(UUID bookingId,BookingStatus status);
 }

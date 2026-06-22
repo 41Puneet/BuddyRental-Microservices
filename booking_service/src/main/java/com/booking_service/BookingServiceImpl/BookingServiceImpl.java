@@ -230,4 +230,14 @@ public BookingResponseDTO updateBooking(
 
         }
     }
+        @Override
+        public BookingResponseDTO updateBookingStatus(UUID bookingId, BookingStatus status) {
+                Booking booking = bookingRepository.findById(bookingId)
+                                .orElseThrow(() -> new IllegalArgumentException("Booking not found with this id:" + bookingId));
+                booking.setBookingStatus(status);
+                Booking updated = bookingRepository.save(booking);
+                VehicleResponseDTO vehicle = vehicleFeignClient.getVehicleById(updated.getVehicleId());
+                logger.info("booking status updated for bookingId={}", bookingId);
+                return mapToBookingDTO(updated, vehicle);
+        }
 }
