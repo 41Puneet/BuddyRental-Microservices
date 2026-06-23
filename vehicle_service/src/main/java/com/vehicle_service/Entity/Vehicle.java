@@ -1,17 +1,19 @@
 package com.vehicle_service.Entity;
+import java.util.UUID;
+
 import com.vehicle_service.Enums.FuelType;
 import com.vehicle_service.Enums.TransmissionType;
 import com.vehicle_service.Enums.VehicleType;
-import java.util.UUID;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 
 
 
@@ -19,8 +21,8 @@ import jakarta.persistence.PrePersist;
 @Table(name="vehicleEntity")
 public class Vehicle {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long vehicleId;
+    @GeneratedValue(strategy=GenerationType.UUID)
+    private UUID vehicleId;
     @Column(nullable = false, unique = true, updatable = false)
     private UUID externalVehicleId;
     private String vehicleNumber;
@@ -44,7 +46,7 @@ public class Vehicle {
     public Vehicle(){
 
     }
-    public Vehicle(Long vehicleId,String vehicleNumber,UUID ownerId,String brand,String model,VehicleType vehicleType,FuelType fuelType,TransmissionType transmissionType,Double pricePerDay,Double securityPrice,Double AdvancePayment,Integer manufacturingYear,String city,boolean isAvailable){
+    public Vehicle(UUID vehicleId,String vehicleNumber,UUID ownerId,String brand,String model,VehicleType vehicleType,FuelType fuelType,TransmissionType transmissionType,Double pricePerDay,Double securityPrice,Double AdvancePayment,Integer manufacturingYear,String city,boolean isAvailable){
         this.vehicleId=vehicleId;
         this.externalVehicleId=UUID.randomUUID();
         this.vehicleNumber=vehicleNumber;
@@ -94,10 +96,10 @@ public class Vehicle {
         this.model = model;
     }
 
-    public Long getVehicleId() {
+    public UUID getVehicleId() {
         return vehicleId;
     }
-    public void setVehicleId(Long vehicleId) {
+    public void setVehicleId(UUID vehicleId) {
         this.vehicleId = vehicleId;
     }
 
