@@ -46,7 +46,14 @@ private String razorpaySecret;
 
     @Override
     public RazorpayOrderResponseDTO createOrder(UUID bookingId, UUID userId) throws RazorpayException {
-       BookingResponseDTO booking=bookingFeignClient.getBookingById(bookingId);
+         logger.info("Booking Id received {}", bookingId);
+
+    BookingResponseDTO booking =
+            bookingFeignClient.getBookingById(bookingId);
+
+    logger.info("Booking fetched {}", booking.getBookingId());
+
+       
        JSONObject object=new JSONObject();
        object.put("amount", booking.getTotalAmount()*100);
        object.put("currency", "INR");

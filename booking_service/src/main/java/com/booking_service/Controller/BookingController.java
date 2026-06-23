@@ -36,8 +36,8 @@ public class BookingController {
     public BookingController(BookingService bookingService){
         this.bookingService = bookingService;
     }
-
-    @PostMapping
+    
+    @PostMapping("/create-booking")
     public ResponseEntity<BookingResponseDTO> createBooking(@Valid @RequestBody BookingRequestDTO request, @RequestHeader("X-User-Id") UUID userId){
 
         return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.createBooking(request, userId));
