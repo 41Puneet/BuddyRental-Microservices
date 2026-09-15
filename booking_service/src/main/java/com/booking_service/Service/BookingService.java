@@ -15,6 +15,8 @@ public interface BookingService {
 
     BookingResponseDTO createBooking(BookingRequestDTO bookingRequestDTO,UUID userId);
 
+    BookingResponseDTO createBookingFromCart(UUID cartItemId, UUID userId);
+
     BookingResponseDTO updateBooking(UUID bookingId,BookingRequestDTO bookingRequestDTO);
 
     BookingResponseDTO cancelBooking(UUID bookingId);

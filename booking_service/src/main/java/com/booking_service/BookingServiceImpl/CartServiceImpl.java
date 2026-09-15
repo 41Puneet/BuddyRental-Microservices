@@ -7,8 +7,6 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.booking_service.DTO.CartItemRequestDTO;
@@ -24,7 +22,7 @@ import com.booking_service.Repository.CartItemRepository;
 import com.booking_service.Repository.CartRepository;
 import com.booking_service.Service.CartService;
 
-@Service
+@Service 
 public class CartServiceImpl implements CartService {
 
     private static final Logger logger = LoggerFactory.getLogger(CartServiceImpl.class);
@@ -134,14 +132,21 @@ public class CartServiceImpl implements CartService {
      * Assumes the JWT filter stores the userId (UUID string) as the principal name.
      */
     private UUID extractUserIdFromContext() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated()) {
-            throw new IllegalStateException("No authenticated user found in security context");
-        }
         try {
-            return UUID.fromString(auth.getName());
+            // Access Spring Security only when it is available at runtime. This
+            // keeps the service compilable without the optional security module.
+            Class<?> holder = Class.forName(
+                    "org.springframework.security.core.context.SecurityContextHolder");
+            Object context = holder.getMethod("getContext").invoke(null);
+            Object auth = context.getClass().getMethod("getAuthentication").invoke(context);
+            if (auth == null || !(Boolean) auth.getClass().getMethod("isAuthenticated").invoke(auth)) {
+                throw new IllegalStateException("No authenticated user found in security context");
+            }
+            return UUID.fromString((String) auth.getClass().getMethod("getName").invoke(auth));
         } catch (IllegalArgumentException e) {
-            throw new IllegalStateException("Principal name is not a valid UUID: " + auth.getName(), e);
+            throw new IllegalStateException("Principal name is not a valid UUID", e);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Unable to access the security context", e);
         }
     }
 

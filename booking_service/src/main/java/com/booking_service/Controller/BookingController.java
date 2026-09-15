@@ -43,6 +43,14 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.createBooking(request, userId));
     }
 
+    @PostMapping("/from-cart/{cartItemId}")
+    public ResponseEntity<BookingResponseDTO> createBookingFromCart(
+            @PathVariable UUID cartItemId,
+            @RequestHeader("X-User-Id") UUID userId) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(bookingService.createBookingFromCart(cartItemId, userId));
+    }
+
     @PutMapping("/update/{bookingId}")
     public ResponseEntity<BookingResponseDTO> updateBooking(@PathVariable UUID bookingId,@Valid @RequestBody BookingRequestDTO request){
 

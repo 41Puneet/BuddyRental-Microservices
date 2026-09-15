@@ -20,11 +20,13 @@ import com.booking_service.DTO.BookingRequestDTO;
 import com.booking_service.DTO.BookingResponseDTO;
 import com.booking_service.FeignClient.VehicleFeignClient;
 import com.booking_service.Repository.BookingRepository;
+import com.booking_service.Repository.CartItemRepository;
 import com.booking_service.Service.BookingService;
 
 import jakarta.transaction.Transactional;
 
 import com.booking_service.Entity.Booking;
+import com.booking_service.Entity.CartItem;
 import com.booking_service.Enums.BookingStatus;
 
 /**
@@ -53,13 +55,16 @@ public class BookingServiceImpl implements BookingService {
     private final Logger logger = LoggerFactory.getLogger(BookingServiceImpl.class);
     private final BookingRepository bookingRepository;
     private final VehicleFeignClient vehicleFeignClient;
+    private final CartItemRepository cartItemRepository;
 
     @Value("${platform.commission.rate:0.15}")
     private double commissionRate;
 
-    public BookingServiceImpl(BookingRepository bookingRepository, VehicleFeignClient vehicleFeignClient) {
+    public BookingServiceImpl(BookingRepository bookingRepository, VehicleFeignClient vehicleFeignClient,
+                              CartItemRepository cartItemRepository) {
         this.bookingRepository = bookingRepository;
         this.vehicleFeignClient = vehicleFeignClient;
+        this.cartItemRepository = cartItemRepository;
     }
 
     /**
@@ -112,6 +117,26 @@ public class BookingServiceImpl implements BookingService {
         Booking saved = bookingRepository.save(booking);
         logger.info("booking created successfully for the vehicle {}", vehicle.getVehicleId());
         return mapToBookingDTO(saved, vehicle);
+    }
+
+    @Override
+    public BookingResponseDTO createBookingFromCart(UUID cartItemId, UUID userId) {
+        CartItem cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new IllegalArgumentException("Cart item not found: " + cartItemId));
+
+        if (!cartItem.getCart().getUserId().equals(userId)) {
+            throw new IllegalArgumentException("Cart item does not belong to this user");
+        }
+
+        BookingRequestDTO request = new BookingRequestDTO(
+                userId,
+                cartItem.getVehicleId(),
+                cartItem.getStartDate(),
+                cartItem.getEndDate());
+        BookingResponseDTO booking = createBooking(request, userId);
+        cartItemRepository.delete(cartItem);
+        logger.info("Booking created from cart item {} for user {}", cartItemId, userId);
+        return booking;
     }
 
     private void checkAvailability(UUID vehicleId, LocalDateTime startDate, LocalDateTime endDate) {

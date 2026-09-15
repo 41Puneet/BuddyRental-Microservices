@@ -3,14 +3,17 @@ package com.booking_service.DTO;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 
 public class CartItemRequestDTO {
     @NotNull
     private UUID vehicleId;
     @NotNull
+    @Future
     private LocalDateTime startDate;
     @NotNull
+    @Future
     private LocalDateTime endDate;
     public UUID getVehicleId() {
         return vehicleId;

@@ -7,6 +7,7 @@ public class VehicleResponseDTO {
     private Double pricePerDay;
     private String brand;
     private String model;
+    private Boolean isAvailable;
 
     public VehicleResponseDTO(){
 
@@ -47,6 +48,14 @@ public class VehicleResponseDTO {
     }
     public void setModel(String model) {
         this.model = model;
+    }
+
+    public Boolean getIsAvailable() {
+        return isAvailable;
+    }
+
+    public void setIsAvailable(Boolean isAvailable) {
+        this.isAvailable = isAvailable;
     }
     
 

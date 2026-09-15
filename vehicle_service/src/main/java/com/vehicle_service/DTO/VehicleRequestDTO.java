@@ -59,6 +59,10 @@ public class VehicleRequestDTO {
     public void setAvaiable(boolean isAvailable) {
         this.isAvailable = isAvailable;
     }
+
+    public void setAvailable(boolean isAvailable) {
+        this.isAvailable = isAvailable;
+    }
     public String getVehicleNumber() {
         return vehicleNumber;
     }
