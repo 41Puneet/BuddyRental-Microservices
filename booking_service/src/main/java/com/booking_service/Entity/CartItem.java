@@ -19,8 +19,7 @@ public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    @Column(nullable=false)
-    @JoinColumn(name="cart_id",nullable = false)
+    @JoinColumn(name = "cart_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Cart cart;
     @Column(nullable=false)
