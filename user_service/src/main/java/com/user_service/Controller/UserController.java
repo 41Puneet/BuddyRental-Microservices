@@ -49,5 +49,10 @@ public ResponseEntity<Void> deleteUser(@PathVariable UUID id){
 public ResponseEntity<?> updateUser(@PathVariable UUID id, @RequestBody UserDTO userDTO){
     return ResponseEntity.ok(userService.updateUser(id, userDTO));
 }
+
+@GetMapping("/{id}")
+public ResponseEntity<?> getUserById(@PathVariable UUID id){
+    return ResponseEntity.ok(userService.getUserById(id));
+}
 }
 

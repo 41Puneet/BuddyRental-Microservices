@@ -1,5 +1,7 @@
 package com.user_service.Security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +17,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 public class SecurityConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     private final JwtFilter jwtFilter;
 
@@ -41,7 +45,7 @@ public class SecurityConfig {
     )
     .exceptionHandling(ex ->
         ex.authenticationEntryPoint((request, response, authException) -> {
-            System.out.println("AUTHENTICATION FAILED");
+            logger.warn("Authentication failed for request: {} {}", request.getMethod(), request.getRequestURI());
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         })
     );
@@ -66,3 +70,4 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 }
+

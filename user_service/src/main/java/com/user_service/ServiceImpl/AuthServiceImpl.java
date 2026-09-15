@@ -48,6 +48,7 @@ public class AuthServiceImpl implements AuthService{
        UserDetails userDetails = CustomUserDetailsService.loadUserByUsername(userDTO.getEmail());
        Map<String, Object> extraClaims = new HashMap<>();
        extraClaims.put("userId", userDTO.getId().toString());
+       extraClaims.put("role", userDTO.getRole().name());
        String accessToken = jwtService.generateToken(extraClaims, userDetails);
        RefreshToken refreshToken = createRefreshToken(userDTO.getId());
        AuthResponseDTO authResponseDTO = new AuthResponseDTO(accessToken, refreshToken.getToken());
@@ -74,6 +75,7 @@ public class AuthServiceImpl implements AuthService{
         UserDetails userDetails=CustomUserDetailsService.loadUserByUsername(loginRequestDTO.getEmail());
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("userId", user.getId().toString());
+        extraClaims.put("role", user.getRole().name());
         String accessToken=jwtService.generateToken(extraClaims, userDetails);
         RefreshToken refreshToken = createRefreshToken(user.getId());
         AuthResponseDTO authResponseDTO = new AuthResponseDTO(accessToken, refreshToken.getToken());
@@ -124,7 +126,8 @@ public class AuthServiceImpl implements AuthService{
 
     String accessToken =
             jwtService.generateToken(
-                    Map.of("userId", user.getId().toString()),
+                    Map.of("userId", user.getId().toString(),
+                           "role", user.getRole().name()),
                     userDetails);
 
     AuthResponseDTO response =

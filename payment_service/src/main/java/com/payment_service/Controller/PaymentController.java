@@ -2,6 +2,8 @@ package com.payment_service.Controller;
 
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,8 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/payments")
 public class PaymentController {
 
+    private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
+
     private final PaymentService paymentService;
 
     public PaymentController(PaymentService paymentService) {
@@ -41,7 +45,7 @@ public class PaymentController {
 
     @PostMapping("/create-order")
     public ResponseEntity<RazorpayOrderResponseDTO> createOrder(@Valid @RequestBody CreateOrderDTO createOrderDTO,@RequestHeader("X-User-Id")UUID userId) throws RazorpayException {
-        System.out.println("CREATE ORDER ENDPOINT HIT");
+        logger.info("Create order request received for bookingId={} userId={}", createOrderDTO.getBookingId(), userId);
         return ResponseEntity.ok(paymentService.createOrder(createOrderDTO.getBookingId(),userId ));
     }
 

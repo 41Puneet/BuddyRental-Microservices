@@ -53,7 +53,14 @@ private String razorpaySecret;
 
     logger.info("Booking fetched {}", booking.getBookingId());
 
-       
+       // Sanity-check: never pass invalid amounts to Razorpay
+       if (booking.getTotalAmount() == null || booking.getTotalAmount() <= 0) {
+           throw new IllegalArgumentException("Invalid booking total amount: " + booking.getTotalAmount());
+       }
+       if (booking.getTotalAmount() > 10_000_000) { // ₹1 crore ceiling
+           throw new IllegalArgumentException("Booking amount exceeds maximum allowed: " + booking.getTotalAmount());
+       }
+
        JSONObject object=new JSONObject();
        object.put("amount", booking.getTotalAmount()*100);
        object.put("currency", "INR");
@@ -145,7 +152,16 @@ if (!valid) {
 }
 payment.setPaymentStatus(PaymentStatus.SUCCESS);
 Payment saved=paymentRepository.save(payment);
-bookingFeignClient.updateBookingStatus(booking.getBookingId(), BookingStatus.CONFIRMED);
+
+// Best-effort: update booking status to CONFIRMED
+// If this fails, payment is still SUCCESS — a reconciliation job can retry later
+try {
+    bookingFeignClient.updateBookingStatus(booking.getBookingId(), BookingStatus.CONFIRMED);
+} catch (Exception e) {
+    logger.error("CRITICAL: Payment {} saved as SUCCESS but failed to update booking {} to CONFIRMED. " +
+            "Manual reconciliation required.", saved.getPaymentId(), booking.getBookingId(), e);
+}
+
 return mapToPaymentDTO(saved);
    }
 

@@ -1,6 +1,8 @@
 package com.booking_service.BookingServiceImpl;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -39,6 +41,14 @@ import com.booking_service.Enums.BookingStatus;
 @Service
 @Transactional
 public class BookingServiceImpl implements BookingService {
+
+    // Valid status transitions — any move NOT in this map is rejected
+    private static final Map<BookingStatus, EnumSet<BookingStatus>> VALID_TRANSITIONS = Map.of(
+        BookingStatus.PENDING,   EnumSet.of(BookingStatus.CONFIRMED, BookingStatus.CANCELLED),
+        BookingStatus.CONFIRMED, EnumSet.of(BookingStatus.COMPLETED, BookingStatus.CANCELLED),
+        BookingStatus.COMPLETED, EnumSet.noneOf(BookingStatus.class),
+        BookingStatus.CANCELLED, EnumSet.noneOf(BookingStatus.class)
+    );
 
     private final Logger logger = LoggerFactory.getLogger(BookingServiceImpl.class);
     private final BookingRepository bookingRepository;
@@ -240,13 +250,24 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingResponseDTO updateBookingStatus(UUID bookingId, BookingStatus status) {
+    public BookingResponseDTO updateBookingStatus(UUID bookingId, BookingStatus newStatus) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found with this id:" + bookingId));
-        booking.setBookingStatus(status);
+
+        BookingStatus currentStatus = booking.getBookingStatus();
+        EnumSet<BookingStatus> allowed = VALID_TRANSITIONS.getOrDefault(
+                currentStatus, EnumSet.noneOf(BookingStatus.class));
+
+        if (!allowed.contains(newStatus)) {
+            logger.warn("Invalid status transition {} → {} for bookingId={}", currentStatus, newStatus, bookingId);
+            throw new IllegalStateException(
+                    "Cannot transition from " + currentStatus + " to " + newStatus);
+        }
+
+        booking.setBookingStatus(newStatus);
         Booking updated = bookingRepository.save(booking);
         VehicleResponseDTO vehicle = vehicleFeignClient.getVehicleById(updated.getVehicleId());
-        logger.info("booking status updated for bookingId={}", bookingId);
+        logger.info("booking status updated {} → {} for bookingId={}", currentStatus, newStatus, bookingId);
         return mapToBookingDTO(updated, vehicle);
     }
 }

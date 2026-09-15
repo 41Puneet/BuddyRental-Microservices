@@ -51,4 +51,9 @@ public class JwtUtil {
         String userId = claims.get("userId", String.class);
         return userId != null ? userId : claims.getSubject();
     }
+
+    public String extractRole(String token) {
+        Claims claims = extractClaims(token);
+        return claims.get("role", String.class);
+    }
 }

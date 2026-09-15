@@ -8,14 +8,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import com.vehicle_service.DTO.UserDTO;
 import com.vehicle_service.DTO.VehicleRequestDTO;
 import com.vehicle_service.DTO.VehicleResponseDTO;
 import com.vehicle_service.Entity.Vehicle;
 import com.vehicle_service.Enums.FuelType;
 import com.vehicle_service.Enums.TransmissionType;
 import com.vehicle_service.Enums.VehicleType;
+import com.vehicle_service.FeignClient.UserFeignClient;
 import com.vehicle_service.Repository.VehicleRepository;
 import com.vehicle_service.Service.VehicleService;
  
@@ -25,16 +29,35 @@ public class VehicleServiceImpl implements VehicleService{
 
 
     private final VehicleRepository vehicleRepository;
+    private final UserFeignClient userFeignClient;
 
     private final Logger logger = LoggerFactory.getLogger(VehicleServiceImpl.class);
 
-    public VehicleServiceImpl(VehicleRepository vehicleRepository){
+    public VehicleServiceImpl(VehicleRepository vehicleRepository, UserFeignClient userFeignClient){
     this.vehicleRepository=vehicleRepository;
+    this.userFeignClient=userFeignClient;
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_OWNER')")
     public VehicleResponseDTO createVehicle(VehicleRequestDTO vehicleRequestDTO,UUID ownerId) {
+
+        // Check that the owner is verified before listing a vehicle
+        try {
+            UserDTO owner = userFeignClient.getUserById(ownerId);
+            if (owner == null || !Boolean.TRUE.equals(owner.getIsVerified())) {
+                logger.warn("Unverified owner {} attempted to list a vehicle", ownerId);
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "Your account must be verified before listing a vehicle. Please complete KYC first.");
+            }
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Could not verify owner status for ownerId={}: {}", ownerId, e.getMessage());
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
+                    "Unable to verify owner status. Please try again later.");
+        }
+
         Optional<Vehicle> vehicle =
                 vehicleRepository.findByVehicleNumber(vehicleRequestDTO.getVehicleNumber());
         if (vehicle.isPresent()) {
