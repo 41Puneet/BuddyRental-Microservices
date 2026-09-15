@@ -38,11 +38,15 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private BookingStatus bookingStatus;
+    @Column(nullable=false)
+    private Double platformCommission;
+    @Column(nullable=false)
+    private Double ownerAmount;
 
 public Booking(){
 
 }
-public Booking(UUID bookingId,UUID userId,UUID vehicleId,LocalDateTime createdAt,LocalDateTime updatedAt,BookingStatus bookingStatus,LocalDateTime startDate,LocalDateTime endDate,Double totalAmount){
+public Booking(UUID bookingId,UUID userId,UUID vehicleId,LocalDateTime createdAt,LocalDateTime updatedAt,BookingStatus bookingStatus,LocalDateTime startDate,LocalDateTime endDate,Double totalAmount,Double platformCommission,Double ownerAmount){
     this.bookingId=bookingId;
     this.userId=userId;
     this.vehicleId=vehicleId;
@@ -52,6 +56,8 @@ public Booking(UUID bookingId,UUID userId,UUID vehicleId,LocalDateTime createdAt
     this.startDate=startDate;
     this.endDate=endDate;
     this.totalAmount=totalAmount;
+    this.platformCommission=platformCommission;
+    this.ownerAmount=ownerAmount;
 }
 public UUID getBookingId() {
     return bookingId;
@@ -107,6 +113,7 @@ public Double getTotalAmount() {
 public void setTotalAmount(Double totalAmount) {
     this.totalAmount = totalAmount;
 }
+
 @PrePersist
 public void onCreate() {
     createdAt = LocalDateTime.now();
@@ -116,4 +123,17 @@ public void onCreate() {
 public void onUpdate() {
     updatedAt = LocalDateTime.now();
 }
+public Double getPlatformCommission() {
+    return platformCommission;
+}
+public void setPlatformCommission(Double platformCommission) {
+    this.platformCommission = platformCommission;
+}
+public Double getOwnerAmount() {
+    return ownerAmount;
+}
+public void setOwnerAmount(Double ownerAmount) {
+    this.ownerAmount = ownerAmount;
+}
+
 }

@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vehicle_service.Controller.Enum.Role;
 import com.vehicle_service.DTO.VehicleRequestDTO;
 import com.vehicle_service.DTO.VehicleResponseDTO;
 import com.vehicle_service.Enums.FuelType;
 import com.vehicle_service.Enums.TransmissionType;
 import com.vehicle_service.Enums.VehicleType;
 import com.vehicle_service.Service.VehicleService;
-
 import jakarta.validation.Valid;
 
 @RestController
@@ -43,7 +43,7 @@ public class VehicleController {
     @PostMapping("/create")
     public ResponseEntity<?> addVehicle(
         @RequestBody @Valid VehicleRequestDTO dto,
-        @RequestHeader ("X-User-Id") UUID ownerId) {
+        @RequestHeader ("X-User-Id") UUID ownerId, @RequestHeader ("X-User-Role") Role role) {
  VehicleResponseDTO vehicle=   vehicleService.createVehicle(dto, ownerId);
     return ResponseEntity.status(201).body(vehicle);
 }
@@ -130,12 +130,12 @@ public class VehicleController {
     @PutMapping("/update/{vehicleNumber}")
     public ResponseEntity<VehicleResponseDTO> updateVehicle(
             @PathVariable String vehicleNumber,
-            @Valid @RequestBody VehicleRequestDTO vehicleRequestDTO,@RequestHeader("X-User-Id")UUID ownerId) {
+            @Valid @RequestBody VehicleRequestDTO vehicleRequestDTO,@RequestHeader("X-User-Id")UUID ownerId,@RequestHeader ("X-User-Role") Role role) {
         return ResponseEntity.ok(vehicleService.updateVehicle(vehicleRequestDTO, vehicleNumber,ownerId));
     }
 
     @DeleteMapping("/{vehicleNumber}")
-    public ResponseEntity<Void> deleteVehicle(@PathVariable String vehicleNumber) {
+    public ResponseEntity<Void> deleteVehicle(@PathVariable String vehicleNumber,@RequestHeader ("X-User-Role") Role role) {
         vehicleService.deleteVehicle(vehicleNumber);
         return ResponseEntity.noContent().build();
     }

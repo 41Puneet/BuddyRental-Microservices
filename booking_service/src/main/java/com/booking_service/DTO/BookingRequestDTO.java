@@ -1,5 +1,6 @@
 package com.booking_service.DTO;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -8,7 +9,8 @@ import jakarta.validation.constraints.NotNull;
 
 public class BookingRequestDTO {
     
-    
+    @NotNull
+    private UUID userId;
     @NotNull
     private UUID vehicleId;
     @Future
@@ -29,10 +31,24 @@ public class BookingRequestDTO {
 
     }
     public BookingRequestDTO(UUID vehicleId,LocalDateTime startDate,LocalDateTime endDate){
-       
         this.vehicleId=vehicleId;
         this.startDate=startDate;
         this.endDate=endDate;
+    }
+
+    public BookingRequestDTO(UUID userId, UUID vehicleId, LocalDateTime startDate, LocalDateTime endDate){
+        this.userId = userId;
+        this.vehicleId = vehicleId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
     }
     
     public UUID getVehicleId() {
@@ -53,6 +69,5 @@ public class BookingRequestDTO {
     public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
     }
-
     
 }

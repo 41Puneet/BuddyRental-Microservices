@@ -37,7 +37,7 @@ public class BookingController {
         this.bookingService = bookingService;
     }
     
-    @PostMapping("/create-booking")
+    @PostMapping({"", "/create-booking"})
     public ResponseEntity<BookingResponseDTO> createBooking(@Valid @RequestBody BookingRequestDTO request, @RequestHeader("X-User-Id") UUID userId){
 
         return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.createBooking(request, userId));
@@ -73,7 +73,7 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.findByVehicleId(vehicleId, pageable));
     }
 
-    @PutMapping("/updateStatus/{bookingId}")
+    @RequestMapping(value = "/updateStatus/{bookingId}", method = {org.springframework.web.bind.annotation.RequestMethod.PUT, org.springframework.web.bind.annotation.RequestMethod.PATCH})
     public ResponseEntity<BookingResponseDTO> updateBookingStatus(@PathVariable UUID bookingId, @RequestParam BookingStatus status) {
         return ResponseEntity.ok(bookingService.updateBookingStatus(bookingId, status));
     }

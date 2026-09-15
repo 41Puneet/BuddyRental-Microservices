@@ -2,9 +2,13 @@ package com.booking_service.DTO;
 import java.util.UUID;
 import java.time.LocalDateTime;
 import com.booking_service.Enums.BookingStatus;
+
+
 public class BookingResponseDTO {
  
+   
     private UUID bookingId;
+   
     private UUID userId;
     private LocalDateTime startDate;
     private LocalDateTime endDate;

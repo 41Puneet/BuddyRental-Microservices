@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public interface UserService {
     UserDTO createUser(RegisterRequestDTO registerRequestDTO);
+    UserDTO getUserById(UUID id);
     Optional <UserDTO> getUserByEmail(String email);
     Optional <UserDTO> getUserByPhoneNumber(String phoneNumber);
     void deleteUser(UUID id);

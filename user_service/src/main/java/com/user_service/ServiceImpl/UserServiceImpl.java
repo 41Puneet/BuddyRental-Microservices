@@ -4,6 +4,9 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -49,8 +52,8 @@ public class UserServiceImpl implements UserService {
         ? registerRequestDTO.getRole()
         : Role.USER
 );
-        user.setCreatedAt(registerRequestDTO.getCreatedAt());
-        user.setUpdatedAt(registerRequestDTO.getUpdatedAt());
+        // user.setCreatedAt(registerRequestDTO.getCreatedAt());
+        // user.setUpdatedAt(registerRequestDTO.getUpdatedAt());
         User savedUser=userRepository.save(user);
         return mapToUserDTO(savedUser);
     }
@@ -67,6 +70,11 @@ public class UserServiceImpl implements UserService {
         userDTO.setUpdatedAt(user.getUpdatedAt());
         return userDTO;
     }
+   @Caching(evict = {
+    @CacheEvict(value = "usersById", key = "#id"),
+    @CacheEvict(value = "usersByEmail", allEntries = true),
+    @CacheEvict(value = "usersByPhoneNumber", allEntries = true)
+})
     @Override
     public void deleteUser(UUID id) {
         User user=userRepository.findById(id).orElseThrow(()->new IllegalArgumentException("User not found with id: "+id));
@@ -78,14 +86,28 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("User not found with id: "+id);
         }  
     }
+    @Cacheable(value = "usersById", key = "#id")
+@Override
+public UserDTO getUserById(UUID id) {
+
+    User user = userRepository.findById(id)
+            .orElseThrow(() ->
+                    new IllegalArgumentException(
+                            "User not found with id: " + id));
+
+    return mapToUserDTO(user);
+}
+    @Cacheable(value="usersByEmail",key="#email")
     @Override
     public Optional<UserDTO> getUserByEmail(String email) {
         User user=userRepository.findByEmail(email).orElseThrow(()->new IllegalArgumentException("User not found with email:"+email));
         if(user!=null){
+            logger.info("db hitted by the request");
             return Optional.of(mapToUserDTO(user));
         }
         return Optional.empty();
     }
+      @Cacheable(value="usersByPhoneNumber",key="#phoneNumber")
     @Override
     public Optional<UserDTO> getUserByPhoneNumber(String phoneNumber) {
         User user=userRepository.findByPhoneNumber(phoneNumber).orElseThrow(()->new IllegalArgumentException("User not found with phone number:"+phoneNumber));
@@ -94,14 +116,26 @@ public class UserServiceImpl implements UserService {
         }
         return Optional.empty();
     }
+    @Caching(
+        evict={
+            @CacheEvict(value="usersById",key="#id"),
+            @CacheEvict(value="usersByEmail",allEntries = true),
+            @CacheEvict(value="usersByPhoneNumber",allEntries=true)
+        }
+    )
     @Override
     public UserDTO updateUser(UUID id, UserDTO userDTO) {
         User user=userRepository.findById(id).orElseThrow(()->new IllegalArgumentException("User not found with id: "+id));
         if(user!=null){
             user.setFullName(userDTO.getFullName());
+             String email=user.getEmail();
+             if(user.getEmail()!=null&&email!=userDTO.getEmail()){
             user.setEmail(userDTO.getEmail());
+             }
+               String phone=user.getPhoneNumber();
+             if(user.getPhoneNumber()!=null&&phone!=userDTO.getPhoneNumber()){
             user.setPhoneNumber(userDTO.getPhoneNumber());
-            user.setRole(Role.USER);
+             }
             user.setUpdatedAt(userDTO.getUpdatedAt());
             User updatedUser=userRepository.save(user);
             logger.info("updated the user successfully{}",userDTO.getEmail());

@@ -3,14 +3,13 @@ package com.vehicle_service.VehicleServiceImpl;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-
 import com.vehicle_service.DTO.VehicleRequestDTO;
 import com.vehicle_service.DTO.VehicleResponseDTO;
 import com.vehicle_service.Entity.Vehicle;
@@ -34,6 +33,7 @@ public class VehicleServiceImpl implements VehicleService{
     }
 
     @Override
+    @PreAuthorize("hasRole('ROLE_OWNER')")
     public VehicleResponseDTO createVehicle(VehicleRequestDTO vehicleRequestDTO,UUID ownerId) {
         Optional<Vehicle> vehicle =
                 vehicleRepository.findByVehicleNumber(vehicleRequestDTO.getVehicleNumber());
@@ -80,6 +80,7 @@ private VehicleResponseDTO mapToVehicleDTO(Vehicle vehicle){
     vehicleDTO.setIsAvailable(vehicle.getIsAvailable());
     return vehicleDTO;
 }
+@PreAuthorize("hasRole('ROLE_OWNER')")
     @Override
     public void deleteVehicle(String vehicleNumber) {
         Optional<Vehicle>vehicle=vehicleRepository.findByVehicleNumber(vehicleNumber);
@@ -142,7 +143,6 @@ private VehicleResponseDTO mapToVehicleDTO(Vehicle vehicle){
         Page<Vehicle>vehicle=vehicleRepository.findByBrand(brand, page);
         logger.info("vehicle found successfully with model{}",brand);
         return vehicle.map(this::mapToVehicleDTO);
-
     }
 
     @Override
@@ -167,7 +167,7 @@ private VehicleResponseDTO mapToVehicleDTO(Vehicle vehicle){
        }
        return Optional.empty();
     }
-
+    @PreAuthorize("hasRole('ROLE_OWNER')")
     @Override
     public VehicleResponseDTO updateVehicle(VehicleRequestDTO vehicleRequestDTO, String vehicleNumber,UUID ownerId) {
         Optional<Vehicle> vehicleOptional = vehicleRepository.findByVehicleNumber(vehicleNumber);

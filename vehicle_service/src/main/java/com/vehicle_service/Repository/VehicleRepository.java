@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 
 
 
-public interface VehicleRepository extends JpaRepository<Vehicle,Long> {
+public interface VehicleRepository extends JpaRepository<Vehicle,UUID> {
 
     Page<Vehicle> findByCity(String city,Pageable pageable);
     List<Vehicle>findByTransmissionType(TransmissionType transmissionType);
